@@ -1,0 +1,20 @@
+--- a/hardware/src/lane/lane_sequencer.sv
++++ b/hardware/src/lane/lane_sequencer.sv
+@@ -561,6 +561,8 @@
+             cvt_resize: CVT_SAME,
+             default  : '0
+           };
++          // Indexed VL/vstart count index elements, independently of data SEW.
++          operand_request[SlideAddrGenA].vtype.vsew = pe_req.eew_vs2;
+           // Since this request goes outside of the lane, we might need to request an
+           // extra operand regardless of whether it is valid in this lane or not.
+           if (operand_request[SlideAddrGenA].vl * NrLanes != pe_req.vl)
+@@ -628,6 +630,8 @@
+             cvt_resize: CVT_SAME,
+             default  : '0
+           };
++          // Indexed VL/vstart count index elements, independently of data SEW.
++          operand_request[SlideAddrGenA].vtype.vsew = pe_req.eew_vs2;
+           // Since this request goes outside of the lane, we might need to request an
+           // extra operand regardless of whether it is valid in this lane or not.
+           if (operand_request[SlideAddrGenA].vl * NrLanes != pe_req.vl)
