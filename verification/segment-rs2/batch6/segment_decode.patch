@@ -1,0 +1,20 @@
+--- a/hardware/src/ara_dispatcher.sv
++++ b/hardware/src/ara_dispatcher.sv
+@@ -3031,7 +3031,7 @@
+             endcase
+ 
+             // Check for segment loads
+-            if (ara_req.nf != 3'b000 && insn.vmem_type.rs2 != 5'b01000) begin
++            if (ara_req.nf != 3'b000 && !(ara_req.op == VLE && insn.vmem_type.rs2 == 5'b01000)) begin
+               if (pending_seg_mem_op_q) begin
+                 // This is a segment load instruction
+                 is_segment_mem_op = 1'b1;
+@@ -3275,7 +3275,7 @@
+             endcase
+ 
+             // Check for segment stores
+-            if (ara_req.nf != 3'b000 && insn.vmem_type.rs2 != 5'b01000) begin
++            if (ara_req.nf != 3'b000 && !(ara_req.op == VSE && insn.vmem_type.rs2 == 5'b01000)) begin
+               if (pending_seg_mem_op_q) begin
+                 // This is a segment store instruction
+                 is_segment_mem_op = 1'b1;
