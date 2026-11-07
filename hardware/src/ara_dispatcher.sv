@@ -1886,6 +1886,24 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                   default: illegal_insn = 1'b1;
                 endcase
 
+                // Ordinary vector destinations use the current LMUL. Keep the existing
+                // single-register defaults and explicit widening EMUL assignments.
+                unique case (insn.varith_type.func6)
+                  6'b001000, 6'b001001, 6'b001010, 6'b001011,
+                  6'b100000, 6'b100001, 6'b100010, 6'b100011,
+                  6'b100100, 6'b100101, 6'b100110, 6'b100111,
+                  6'b101001, 6'b101011, 6'b101101, 6'b101111,
+                  6'b010010, 6'b010111:
+                    ara_req.emul = csr_vtype_q.vlmul;
+                  6'b010100: begin
+                    if (insn.varith_type.rs1 inside {5'b10000, 5'b10001})
+                      ara_req.emul = csr_vtype_q.vlmul;
+                  end
+                  default: begin
+                    // Preserve the EMUL selected by the instruction decoder.
+                  end
+                endcase
+
                 // Instructions with an integer LMUL have extra constraints on the registers they can
                 // access. These constraints can be different for the two source operands and the
                 // destination register.

@@ -279,6 +279,111 @@ void TEST_CASE4() {
            0x16ce205f44fb8635);
 }
 
+static unsigned emul_completed, emul_errors;
+
+#define EMUL_EXEC(LMUL, WHOLE_LOAD)                                             \
+  asm volatile(                                                               \
+      "fence rw, rw\n"                                                       \
+      "csrw vstart, zero\n"                                                  \
+      "vsetvli t0, zero, e32, m" #LMUL ", tu, mu\n"                        \
+      "vle32.v v8, (%[a])\n"                                                \
+      "vle32.v v16, (%[b])\n"                                               \
+      WHOLE_LOAD " v24, (%[d])\n"                                           \
+      "csrr t0, vl\n"                                                       \
+      "vsetvli %[active], %[length], e32, m" #LMUL ", tu, mu\n"              \
+      "vmacc.vv v24, v8, v16\n"                                             \
+      "csrr %[after], vl\n"                                                 \
+      "csrr %[start], vstart\n"                                              \
+      "vsetvli t0, zero, e32, m" #LMUL ", tu, mu\n"                        \
+      "vse32.v v24, (%[out])\n"                                              \
+      "csrr t0, vl\n"                                                       \
+      "fence rw, rw\n"                                                       \
+      : [active] "=&r"(active), [after] "=&r"(after), [start] "=&r"(start)     \
+      : [length] "r"(length), [a] "r"(a + 4), [b] "r"(b + 4),               \
+        [d] "r"(destination + 4), [out] "r"(output + 4)                       \
+      : "t0", "v8", "v9", "v10", "v11", "v16", "v17", "v18", "v19",      \
+        "v24", "v25", "v26", "v27", "memory")
+
+static void emul_case(unsigned id, unsigned lmul) {
+  unsigned long bytes, active, after, start;
+  asm volatile("csrr %0, vlenb" : "=r"(bytes));
+  unsigned long count = bytes * lmul / sizeof(uint32_t);
+  if (count < 2) {
+    printf("[EMUL_UNSUPPORTED] id=%u vlenb=%lu\n", id, bytes);
+    ++num_failed;
+    ++emul_errors;
+    return;
+  }
+  unsigned long length = count - 1;
+  volatile uint32_t a[count + 8] __attribute__((aligned(16)));
+  volatile uint32_t b[count + 8] __attribute__((aligned(16)));
+  volatile uint32_t destination[count + 8] __attribute__((aligned(16)));
+  volatile uint32_t output[count + 8] __attribute__((aligned(16)));
+  for (unsigned long i = 0; i < count + 8; ++i) {
+    a[i] = UINT32_C(0x12345678) ^ (uint32_t)i;
+    b[i] = UINT32_C(0x87654321) ^ (uint32_t)i;
+    destination[i] = UINT32_C(0x13579bdf) ^ (uint32_t)i;
+    output[i] = UINT32_C(0xfdb97531) ^ (uint32_t)i;
+  }
+  for (unsigned long i = 0; i < count; ++i) {
+    a[i + 4] = UINT32_C(0x10203) + (uint32_t)(31 * i);
+    b[i + 4] = 3 + (uint32_t)(257 * i);
+    destination[i + 4] = UINT32_C(0x89abcdef) + (uint32_t)(0x10203 * i);
+  }
+  printf("[EMUL_BEGIN] id=%u sew=32 lmul=%u vl=%lu elements=%lu\n",
+         id, lmul, length, count);
+  if (lmul == 1) {
+    EMUL_EXEC(1, "vl1re8.v");
+  } else if (lmul == 2) {
+    EMUL_EXEC(2, "vl2re8.v");
+  } else {
+    EMUL_EXEC(4, "vl4re8.v");
+  }
+  unsigned errors = 0;
+  for (unsigned long i = 0; i < count; ++i) {
+    uint32_t expected = destination[i + 4];
+    if (i < length)
+      expected += (uint32_t)((uint64_t)a[i + 4] * b[i + 4]);
+    if (output[i + 4] != expected) {
+      if (!errors)
+        printf("[EMUL_MISMATCH] id=%u index=%lu got=%08x expected=%08x\n",
+               id, i, output[i + 4], expected);
+      ++errors;
+    }
+    if (a[i + 4] != UINT32_C(0x10203) + (uint32_t)(31 * i)) ++errors;
+    if (b[i + 4] != 3 + (uint32_t)(257 * i)) ++errors;
+    if (destination[i + 4] != UINT32_C(0x89abcdef) +
+                                  (uint32_t)(0x10203 * i)) ++errors;
+  }
+  for (unsigned i = 0; i < 4; ++i) {
+    unsigned long right = count + 4 + i;
+    if (a[i] != (UINT32_C(0x12345678) ^ i) ||
+        a[right] != (UINT32_C(0x12345678) ^ (uint32_t)right)) ++errors;
+    if (b[i] != (UINT32_C(0x87654321) ^ i) ||
+        b[right] != (UINT32_C(0x87654321) ^ (uint32_t)right)) ++errors;
+    if (destination[i] != (UINT32_C(0x13579bdf) ^ i) ||
+        destination[right] != (UINT32_C(0x13579bdf) ^ (uint32_t)right)) ++errors;
+    if (output[i] != (UINT32_C(0xfdb97531) ^ i) ||
+        output[right] != (UINT32_C(0xfdb97531) ^ (uint32_t)right)) ++errors;
+  }
+  if (active != length || after != length || start != 0) ++errors;
+  ++emul_completed;
+  emul_errors += errors;
+  if (errors) ++num_failed;
+  printf("[EMUL_CASE] id=%u output_checks=%lu guard_words=32 errors=%u\n",
+         id, count, errors);
+}
+
+static void TEST_DESTINATION_EMUL(void) {
+  emul_completed = emul_errors = 0;
+  emul_case(17, 1);
+  emul_case(18, 2);
+  emul_case(19, 4);
+  printf("[EMUL_DONE] completed=%u errors=%u\n", emul_completed, emul_errors);
+}
+#undef EMUL_EXEC
+
+
 int main(void) {
   INIT_CHECK();
   enable_vec();
@@ -287,6 +392,7 @@ int main(void) {
   TEST_CASE2();
   TEST_CASE3();
   TEST_CASE4();
+  TEST_DESTINATION_EMUL();
 
   EXIT_CHECK();
 }
