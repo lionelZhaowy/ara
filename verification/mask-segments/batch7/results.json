@@ -1,0 +1,1671 @@
+{
+  "date": "2026-11-07 Asia/Shanghai",
+  "official_base": "34bd3bc152421b4601a7bf3d6e8e91ffb545c99e",
+  "configuration": {
+    "lanes": 2,
+    "vlen": 2048,
+    "elen": 64,
+    "wt": true,
+    "pmp_entries": 0
+  },
+  "tools": {
+    "LLVM": "20.1.0",
+    "VCS": "W-2024.09-SP1 Full64",
+    "Spike": "5cf439b2"
+  },
+  "functional_comparison_calls": 20,
+  "extra_diagnostic_reruns": 8,
+  "official_regression_calls": 8,
+  "combined_J_calls": 7,
+  "new_RTL_calls": 43,
+  "accepted_complete_runs": 23,
+  "matrix": [
+    {
+      "variant": "O",
+      "app": "mask_nf5_load",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 254.57462167739868,
+      "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+      "simv_sha256": "4c128ecb2f10ac8b075dbcc5c6d1276a48fbfcf410143c29630494626d05596e",
+      "log_sha256": "10029a06edc58c09d4176da6ea240f4c298a92d7562774eb09977ccd2db19c7e",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "mask_word_request": 4,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "completed_payload_count": 1,
+        "architectural_consumed_mask": 2,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 12,
+      "completed_owners": 11,
+      "emitted_payloads": 14,
+      "consumed_payloads": 12,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          205,
+          206,
+          207
+        ],
+        "actual_final_lines": [
+          209,
+          210,
+          211
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+        "fence_pc": "0x800002ee",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002740",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "4047de72d23bde5e36eb2a286e370605bd1de260dd93e0c2285af0bbe1fcc8af"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003eb8",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "O",
+      "app": "mask_nf5_store",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 256.1282880306244,
+      "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+      "simv_sha256": "4c128ecb2f10ac8b075dbcc5c6d1276a48fbfcf410143c29630494626d05596e",
+      "log_sha256": "3cf7806079f781884702a338a51e1a0eadb8f0421c4ef8f12321bd6ad10468e2",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "mask_word_request": 4,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "architectural_consumed_mask": 1,
+        "completed_payload_count": 1,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 12,
+      "completed_owners": 11,
+      "emitted_payloads": 14,
+      "consumed_payloads": 12,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          202,
+          203,
+          204
+        ],
+        "actual_final_lines": [
+          206,
+          207,
+          208
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+        "fence_pc": "0x800002ec",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002a00",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "e9b171bd47e5b734ce6b1d158c6598d0e0a498e5b07f7a0da4ae59b6eb18fc99"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80004178",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "O",
+      "app": "mask_nf2_load",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 250.22609329223633,
+      "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+      "simv_sha256": "4c128ecb2f10ac8b075dbcc5c6d1276a48fbfcf410143c29630494626d05596e",
+      "log_sha256": "7152db8362d73e8e897a7f6cb36138cf74c6a9941772279729edbc5a01d83d49",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "mask_word_request": 60,
+        "architectural_emitted_mask": 30,
+        "architectural_consumed_mask": 30,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "completed_payload_count": 1,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 34,
+      "completed_owners": 33,
+      "emitted_payloads": 36,
+      "consumed_payloads": 34,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          538,
+          539,
+          540
+        ],
+        "actual_final_lines": [
+          542,
+          543,
+          544
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+        "fence_pc": "0x80001898",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002700",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "1fdce0f62d03d6056377e415909b7543158f6015cccda48d4d65bb6255ad9955"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003578",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "O",
+      "app": "mask_nf2_store",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 254.36055541038513,
+      "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+      "simv_sha256": "4c128ecb2f10ac8b075dbcc5c6d1276a48fbfcf410143c29630494626d05596e",
+      "log_sha256": "04dfcd848136dd49cc7b48fe01c41be50d6b2aa7eebd5aea6431912383c5bf66",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "mask_word_request": 60,
+        "architectural_emitted_mask": 30,
+        "architectural_consumed_mask": 30,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "completed_payload_count": 1,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 34,
+      "completed_owners": 33,
+      "emitted_payloads": 36,
+      "consumed_payloads": 34,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          535,
+          536,
+          537
+        ],
+        "actual_final_lines": [
+          539,
+          540,
+          541
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+        "fence_pc": "0x80001954",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x800027c0",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "127a23106d6f46ea7986502a7d3c676d45e81aa5ff7ec0d75ca7b92bde7b4396"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003638",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "M",
+      "app": "mask_nf5_load",
+      "assessment": "DATA_PASS_WITH_WRONG_MASK_REQUESTS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 66.77775716781616,
+      "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+      "simv_sha256": "edbc3dbe877729c0a431c5fc5f15eca5839655dd439fdf763d9b1cc5f3b88250",
+      "log_sha256": "689a0b2dc1b8b659dfdc604725300e6bd1a23cde52aa0321061dfc28d7ce4893",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7",
+        "nf": 5,
+        "family": 1,
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_word_request": 20
+      },
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": null,
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+        "fence_pc": "0x800002ee",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002740",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003eb8",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "M",
+      "app": "mask_nf5_store",
+      "assessment": "DATA_PASS_WITH_WRONG_MASK_REQUESTS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 70.56851077079773,
+      "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+      "simv_sha256": "edbc3dbe877729c0a431c5fc5f15eca5839655dd439fdf763d9b1cc5f3b88250",
+      "log_sha256": "eacd60c4abc9e23d8c86a1bcc7884c36d72a90d31a813736ee95282c082323b6",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090",
+        "nf": 5,
+        "family": 2,
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_word_request": 20
+      },
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": null,
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+        "fence_pc": "0x800002ec",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002a00",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80004178",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "M",
+      "app": "mask_nf2_load",
+      "assessment": "FAIL_ASSERTION",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 23.858380556106567,
+      "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+      "simv_sha256": "edbc3dbe877729c0a431c5fc5f15eca5839655dd439fdf763d9b1cc5f3b88250",
+      "log_sha256": "a613c1cad6a0e01e7820ab9390fea2a029f9970d1e6fe00e75021d0704656cf8",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_word_request": 1016,
+        "architectural_emitted_mask": 508,
+        "architectural_consumed_mask": 507,
+        "stale_vrf_operand_owner": 518,
+        "stale_mask_payload_at_cut_fill": 496,
+        "stale_mask_payload_owner": 240,
+        "software_phase_errors": 1,
+        "missing_complete_three_phase_run": 1
+      },
+      "accepted_owners": 516,
+      "completed_owners": 515,
+      "emitted_payloads": 516,
+      "consumed_payloads": 514,
+      "deadline_binding": null,
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+        "fence_pc": "0x80001898",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002700",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "cd541cbf525eca0a6e58ee5a2be08918e506816126537b986a9853854a8bf093"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003578",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "4f12fa9e685428bcf226169192fb132acdfe38da0785eda1a6bbb137c51d4976"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "M",
+      "app": "mask_nf2_store",
+      "assessment": "FAIL_ASSERTION",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 214.8713390827179,
+      "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+      "simv_sha256": "edbc3dbe877729c0a431c5fc5f15eca5839655dd439fdf763d9b1cc5f3b88250",
+      "log_sha256": "f8eae0f46c2a5a910d1ef34b791560bf7039c2033ae0aabd5014b95c242436c6",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_word_request": 1016,
+        "architectural_emitted_mask": 508,
+        "architectural_consumed_mask": 507,
+        "stale_vrf_operand_owner": 518,
+        "software_phase_errors": 1,
+        "missing_complete_three_phase_run": 1
+      },
+      "accepted_owners": 516,
+      "completed_owners": 515,
+      "emitted_payloads": 516,
+      "consumed_payloads": 515,
+      "deadline_binding": null,
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+        "fence_pc": "0x80001954",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x800027c0",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "d1b2c686b421cde8848677aea80da58837d06d54ef0d4695e47c1b713557bc32"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003638",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "4f12fa9e685428bcf226169192fb132acdfe38da0785eda1a6bbb137c51d4976"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "L",
+      "app": "mask_nf5_load",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 258.5869333744049,
+      "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+      "simv_sha256": "119805c398578fe88682786e611b0a7a9462aa443271b912a8a9b37a46ac9b70",
+      "log_sha256": "e84ff7548a18c8e0d30f1d9f48f0833f00146621fe9c31fd84f45c6e7df17be7",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "completed_payload_count": 1,
+        "architectural_consumed_mask": 2,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 12,
+      "completed_owners": 11,
+      "emitted_payloads": 14,
+      "consumed_payloads": 12,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          205,
+          206,
+          207
+        ],
+        "actual_final_lines": [
+          209,
+          210,
+          211
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+        "fence_pc": "0x800002ee",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002740",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "4047de72d23bde5e36eb2a286e370605bd1de260dd93e0c2285af0bbe1fcc8af"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003eb8",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "L",
+      "app": "mask_nf5_store",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 272.440301656723,
+      "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+      "simv_sha256": "119805c398578fe88682786e611b0a7a9462aa443271b912a8a9b37a46ac9b70",
+      "log_sha256": "ce0b63e2ae3c9ebe16faa969ba87b4d7c736a57c4b7e20992242bd1ab852152f",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "architectural_consumed_mask": 1,
+        "completed_payload_count": 1,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 12,
+      "completed_owners": 11,
+      "emitted_payloads": 14,
+      "consumed_payloads": 12,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          202,
+          203,
+          204
+        ],
+        "actual_final_lines": [
+          206,
+          207,
+          208
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+        "fence_pc": "0x800002ec",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002a00",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "e9b171bd47e5b734ce6b1d158c6598d0e0a498e5b07f7a0da4ae59b6eb18fc99"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80004178",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "L",
+      "app": "mask_nf2_load",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 252.93162155151367,
+      "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+      "simv_sha256": "119805c398578fe88682786e611b0a7a9462aa443271b912a8a9b37a46ac9b70",
+      "log_sha256": "645b4ebe641a9e9f1d5ae50061f97feaba03d973152b0e9fc920c1afda4cd568",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "completed_payload_count": 1,
+        "architectural_consumed_mask": 2,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 34,
+      "completed_owners": 33,
+      "emitted_payloads": 36,
+      "consumed_payloads": 34,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          538,
+          539,
+          540
+        ],
+        "actual_final_lines": [
+          542,
+          543,
+          544
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+        "fence_pc": "0x80001898",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002700",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "1fdce0f62d03d6056377e415909b7543158f6015cccda48d4d65bb6255ad9955"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003578",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "L",
+      "app": "mask_nf2_store",
+      "assessment": "FAIL_PROTOCOL_WITH_HDL_CUTOFF",
+      "native_target": null,
+      "complete_three_phases": false,
+      "seconds": 252.90200471878052,
+      "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+      "simv_sha256": "119805c398578fe88682786e611b0a7a9462aa443271b912a8a9b37a46ac9b70",
+      "log_sha256": "2a5a98c2b8b7a507c8eafbcd64097cf8a83f77f280faa11369193b00d1975951",
+      "signature_words": null,
+      "checks": null,
+      "gold": null,
+      "event_assessment": "DIAGNOSTIC",
+      "event_differences": {
+        "mask_initialization": 2,
+        "architectural_emitted_mask": 2,
+        "payload_interval_progression": 2,
+        "surplus_mask_payload": 2,
+        "architectural_consumed_mask": 1,
+        "completed_payload_count": 1,
+        "stale_mask_payload_owner": 1
+      },
+      "accepted_owners": 34,
+      "completed_owners": 33,
+      "emitted_payloads": 36,
+      "consumed_payloads": 34,
+      "deadline_binding": {
+        "deadline_ns": 20000000,
+        "snapshot_lines": [
+          535,
+          536,
+          537
+        ],
+        "actual_final_lines": [
+          539,
+          540,
+          541
+        ],
+        "summary_source": "actual_final_and_matching_snapshot"
+      },
+      "event_negative_controls": null,
+      "export": {
+        "status": "INCOMPLETE_DIAGNOSTIC",
+        "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+        "fence_pc": "0x80001954",
+        "native_target": null,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x800027c0",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "127a23106d6f46ea7986502a7d3c676d45e81aa5ff7ec0d75ca7b92bde7b4396"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003638",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "22dbe6b7b70a64966e31813e597db3e863492d341bee2fb05c0e8864773387af"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "ML",
+      "app": "mask_nf5_load",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 67.18743181228638,
+      "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+      "simv_sha256": "3d0b1883b67f9b52ae3c1de1ebd370471a87a396096d2274d703913443e5e3a1",
+      "log_sha256": "028193802e3403c42d7493b54dd729c114195c26b6260c5f8e7cf5ab985db591",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7",
+        "nf": 5,
+        "family": 1,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+        "fence_pc": "0x800002ee",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002740",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003eb8",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "ML",
+      "app": "mask_nf5_store",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 70.2470371723175,
+      "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+      "simv_sha256": "3d0b1883b67f9b52ae3c1de1ebd370471a87a396096d2274d703913443e5e3a1",
+      "log_sha256": "4c94dcc3386abf81ce4f474c1642e396fd9ef1438b43e287ddeb73caf03553db",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090",
+        "nf": 5,
+        "family": 2,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+        "fence_pc": "0x800002ec",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002a00",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80004178",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "ML",
+      "app": "mask_nf2_load",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 49.476811170578,
+      "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+      "simv_sha256": "3d0b1883b67f9b52ae3c1de1ebd370471a87a396096d2274d703913443e5e3a1",
+      "log_sha256": "b92c47491b832de4e890b7619057c43f8403480dfcc6534996f7f150d0bc912a",
+      "signature_words": 926,
+      "checks": 9279,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 926,
+        "expected_words": 926,
+        "checks": 9279,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "bc4318dbbf61d45749b8c89469d0bdc8f01bafb1b2622fec140a14ff698d776a",
+        "nf": 2,
+        "family": 1,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "repeated_first_mask_word": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 516,
+      "completed_owners": 516,
+      "emitted_payloads": 516,
+      "consumed_payloads": 516,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+        "fence_pc": "0x80001898",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002700",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "bc4318dbbf61d45749b8c89469d0bdc8f01bafb1b2622fec140a14ff698d776a"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003578",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "ML",
+      "app": "mask_nf2_store",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 519.4528691768646,
+      "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+      "simv_sha256": "3d0b1883b67f9b52ae3c1de1ebd370471a87a396096d2274d703913443e5e3a1",
+      "log_sha256": "79807b0c5c67ec98abae1f4f04efb43c0d29b1a3e78580f168ef1b1dbd6cb41b",
+      "signature_words": 926,
+      "checks": 9279,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 926,
+        "expected_words": 926,
+        "checks": 9279,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "5419d79295bfb0ebcda5b4efbc911439ee13bf325e31723ac44e3ac834d4ecf3",
+        "nf": 2,
+        "family": 2,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "repeated_first_mask_word": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 516,
+      "completed_owners": 516,
+      "emitted_payloads": 516,
+      "consumed_payloads": 516,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+        "fence_pc": "0x80001954",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x800027c0",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "5419d79295bfb0ebcda5b4efbc911439ee13bf325e31723ac44e3ac834d4ecf3"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003638",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "A",
+      "app": "mask_nf5_load",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 67.10954928398132,
+      "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+      "simv_sha256": "a7050aaeebeb05f7c570c69b6a8b2f44d551aca0b17a9639ea189ec3acd0c5b7",
+      "log_sha256": "785a3f3a55d3471e970f69543e8c235cf7c5870deef2ec66008220930d631cf2",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7",
+        "nf": 5,
+        "family": 1,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d",
+        "fence_pc": "0x800002ee",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002740",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "dbb30c07dd9aa38fdff9ad9becc19cc676b39597006027ed2f1a586eb6077ba7"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003eb8",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "A",
+      "app": "mask_nf5_store",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 70.475834608078,
+      "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+      "simv_sha256": "a7050aaeebeb05f7c570c69b6a8b2f44d551aca0b17a9639ea189ec3acd0c5b7",
+      "log_sha256": "e55bd208f761cf69979a368fd19b7fd71ec56df9bcd0bb764a0fb58c9675ec5a",
+      "signature_words": 1502,
+      "checks": 13887,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 1502,
+        "expected_words": 1502,
+        "checks": 13887,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090",
+        "nf": 5,
+        "family": 2,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 30,
+      "completed_owners": 30,
+      "emitted_payloads": 30,
+      "consumed_payloads": 30,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf",
+        "fence_pc": "0x800002ec",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002a00",
+            "words": 1502,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "59057329fe9ac3d965ba5bfc9b5733c8d13807e3edff9ddfef9fc3f51b44a090"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80004178",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "A",
+      "app": "mask_nf2_load",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 49.23704743385315,
+      "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+      "simv_sha256": "a7050aaeebeb05f7c570c69b6a8b2f44d551aca0b17a9639ea189ec3acd0c5b7",
+      "log_sha256": "4cb4d5a6c09cde7d1e86124e4fad5e665d9e18d020c387eea7f336ee59b641bc",
+      "signature_words": 926,
+      "checks": 9279,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 926,
+        "expected_words": 926,
+        "checks": 9279,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "bc4318dbbf61d45749b8c89469d0bdc8f01bafb1b2622fec140a14ff698d776a",
+        "nf": 2,
+        "family": 1,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "repeated_first_mask_word": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 516,
+      "completed_owners": 516,
+      "emitted_payloads": 516,
+      "consumed_payloads": 516,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211",
+        "fence_pc": "0x80001898",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x80002700",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "bc4318dbbf61d45749b8c89469d0bdc8f01bafb1b2622fec140a14ff698d776a"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003578",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    },
+    {
+      "variant": "A",
+      "app": "mask_nf2_store",
+      "assessment": "PASS",
+      "native_target": 0,
+      "complete_three_phases": true,
+      "seconds": 516.0275831222534,
+      "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+      "simv_sha256": "a7050aaeebeb05f7c570c69b6a8b2f44d551aca0b17a9639ea189ec3acd0c5b7",
+      "log_sha256": "aa25c86af81395e5c95857be6cb719af44e010b73481811c23b22014d5be5c77",
+      "signature_words": 926,
+      "checks": 9279,
+      "gold": {
+        "assessment": "PASS",
+        "actual_words": 926,
+        "expected_words": 926,
+        "checks": 9279,
+        "different_words": 0,
+        "first_differences": [],
+        "length_matches": true,
+        "kind": "actual_signature_review",
+        "signature_sha256": "5419d79295bfb0ebcda5b4efbc911439ee13bf325e31723ac44e3ac834d4ecf3",
+        "nf": 2,
+        "family": 2,
+        "negative_controls": {
+          "assessment": "PASS",
+          "rejected": {
+            "phase0_data_bit": true,
+            "phase0_guard": true,
+            "phase0_vstart": true,
+            "phase1_data_bit": true,
+            "phase1_guard": true,
+            "phase1_vstart": true,
+            "phase2_data_bit": true,
+            "phase2_guard": true,
+            "phase2_vstart": true,
+            "stale_first_mask_in_second_phase": true,
+            "repeated_first_mask_word": true,
+            "duplicate_phase_identity": true,
+            "truncated_final_record": true,
+            "wrong_check_count": true
+          }
+        },
+        "checker_sha256": "9beab1f33a58679d81801c864984ffb727e7200df555c7c361105cd219bff26a"
+      },
+      "event_assessment": "PASS",
+      "event_differences": {},
+      "accepted_owners": 516,
+      "completed_owners": 516,
+      "emitted_payloads": 516,
+      "consumed_payloads": 516,
+      "deadline_binding": null,
+      "event_negative_controls": {
+        "assessment": "PASS",
+        "rejected": {
+          "wrong_physical_word": true,
+          "wrong_mask_cut_byte": true,
+          "wrong_consumed_byte": true,
+          "wrong_prefetched_slot": true,
+          "wrong_returned_operand": true,
+          "payload_owner_reassigned_without_data_change": true
+        },
+        "scope": "In-memory mutations of the actual recorded event stream. No new RTL run."
+      },
+      "export": {
+        "status": "EXPORT_CHECKED",
+        "elf_sha256": "8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7",
+        "fence_pc": "0x80001954",
+        "native_target": 0,
+        "exports": [
+          {
+            "symbol": "v01_memory_gap_signature",
+            "base": "0x800027c0",
+            "words": 926,
+            "unknown_words": 0,
+            "file": "v01_region_0.hex",
+            "sha256": "5419d79295bfb0ebcda5b4efbc911439ee13bf325e31723ac44e3ac834d4ecf3"
+          },
+          {
+            "symbol": "v01_memory_gap_phase",
+            "base": "0x80003638",
+            "words": 1,
+            "unknown_words": 0,
+            "file": "v01_region_1.hex",
+            "sha256": "129805c9e04279ac36de91e8a541a3b3ff5bdda8542b6e7dec6f7771439362cf"
+          }
+        ],
+        "scope": "Export integrity only. Architectural gold and native simulator logs require separate checks."
+      }
+    }
+  ],
+  "official_regressions": [
+    {
+      "run": "O_rv64uv-ara-vfirst",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 2.2942910194396973,
+      "log_sha256": "a47ea3b3c3446411554a787d0ab5671d28fd73debe503584cf4cbbb568a0c767"
+    },
+    {
+      "run": "O_rv64uv-ara-vcpop",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 4.237659931182861,
+      "log_sha256": "80d5b93b49fae5a993d6782cc33a70dd65f25585c89b9f4c3e41c81a4138255c"
+    },
+    {
+      "run": "O_rv64uv-ara-vslideup",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 8.191223382949829,
+      "log_sha256": "30f8913037d2107ab307f69d35c46915e7594028dc3e294e59327999d9c94d72"
+    },
+    {
+      "run": "O_rv64uv-ara-vslidedown",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 7.98645281791687,
+      "log_sha256": "77caf41172d3a03413ed2e8a46d359b0e1ccdd7834b167afbd437a021bdd0002"
+    },
+    {
+      "run": "ML_rv64uv-ara-vcpop",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 4.229687452316284,
+      "log_sha256": "68ef6125026d05d76cc1e18ca3346d3a62604cc733e25f726862aad63e1560fe"
+    },
+    {
+      "run": "ML_rv64uv-ara-vfirst",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 2.301924705505371,
+      "log_sha256": "9e51ee65481118322578ce3bf98a2b49ff414a18e42a3e876daa0574a9ea7d51"
+    },
+    {
+      "run": "ML_rv64uv-ara-vslideup",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 8.071357011795044,
+      "log_sha256": "3dd2da0a0e68972c405033741c89f98408f68ba36a8406fdf4b92531ee771a13"
+    },
+    {
+      "run": "ML_rv64uv-ara-vslidedown",
+      "group": "official_regressions",
+      "result": "PASS",
+      "seconds": 7.9422149658203125,
+      "log_sha256": "300f590d47c5c7b6666e6f075d274c98a845d9b12f5d18354c4742128a472960"
+    }
+  ],
+  "combination_J": [
+    {
+      "app": "idx64_vl3",
+      "statuses": {
+        "export": 0,
+        "gold": 0
+      }
+    },
+    {
+      "app": "idx_nf2",
+      "statuses": {
+        "export": 0,
+        "gold": 0
+      }
+    },
+    {
+      "app": "mask_nf2_load",
+      "statuses": {
+        "export": 0,
+        "gold": 0,
+        "events": 0
+      }
+    },
+    {
+      "app": "mask_nf2_store",
+      "statuses": {
+        "export": 0,
+        "gold": 0,
+        "events": 0
+      }
+    },
+    {
+      "app": "mask_nf5_load",
+      "statuses": {
+        "export": 0,
+        "gold": 0,
+        "events": 0
+      }
+    },
+    {
+      "app": "mask_nf5_store",
+      "statuses": {
+        "export": 0,
+        "gold": 0,
+        "events": 0
+      }
+    },
+    {
+      "app": "segment_rs2",
+      "statuses": {
+        "export": 0,
+        "gold": 0
+      }
+    }
+  ],
+  "preserved_failures": {
+    "historic_wrong_fence": {
+      "pc": "0x800008b6",
+      "late_byte_writes": 2004,
+      "accepted": false
+    },
+    "first_O_L_runs": "All eight original 20ms cutoffs lacked scheduled deadline snapshots. Their checker rejections and raw data remain retained.",
+    "deadline_fix": "VCS minimal TB confirms that run 0 ns processes the same timestamp after run 20 ms. Only the eight incomplete O/L diagnostics reran. No DUT, observer, ELF, or checker changed."
+  },
+  "implementation_checks": {
+    "status": "Previously accepted frozen-input generic checks reused",
+    "lane_variants": [
+      "O",
+      "I",
+      "L",
+      "A",
+      "IL"
+    ],
+    "lane_sequential_cells": 1050,
+    "masku_variants": [
+      "O",
+      "M",
+      "A"
+    ],
+    "masku_sequential_cells": 1640,
+    "dispatcher_variants": [
+      "O",
+      "D"
+    ],
+    "dispatcher_sequential_cells": 738,
+    "latches": 0,
+    "scope": "Real-module compile -no_map structural checks only. No technology mapping, timing closure, or physical signoff."
+  },
+  "model_evidence": "Four unchanged separate Spike ELFs retain previously accepted complete signatures. No new Spike runs in this continuation.",
+  "warnings": "The unchanged time-zero axi_inval_filter RT-NCMUCS warning remains. Candidate native logs contain no Error/Fatal/UCLI error.",
+  "scope": "Segment-generated internal starts with architectural vstart=0. No architectural nonzero-vstart/fault restart or other lane/VLEN claims."
+}

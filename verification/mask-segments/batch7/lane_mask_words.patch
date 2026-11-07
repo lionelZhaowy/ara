@@ -1,0 +1,38 @@
+--- a/hardware/src/lane/lane_sequencer.sv
++++ b/hardware/src/lane/lane_sequencer.sv
+@@ -533,7 +533,7 @@
+             eew    : EW64,
+             vtype  : pe_req.vtype,
+             vl     : pe_req.vl / NrLanes / ELEN,
+-            vstart : vfu_operation_d.vstart,
++            vstart : pe_req.vstart / (NrLanes * ELEN),
+             hazard : pe_req.hazard_vm | pe_req.hazard_vd,
+             target_fu : ALU_SLDU,
+             conv      : OpQueueConversionNone,
+@@ -544,6 +544,8 @@
+           // extra operand regardless of whether it is valid in this lane or not.
+           if (operand_request[MaskM].vl * NrLanes * ELEN != pe_req.vl)
+             operand_request[MaskM].vl += 1;
++          // MaskM counts 64-bit words per lane; vstart selects the first word.
++          operand_request[MaskM].vl -= operand_request[MaskM].vstart;
+           operand_request_push[MaskM] = !pe_req.vm;
+ 
+           // Load indexed
+@@ -599,7 +601,7 @@
+             eew    : EW64,
+             vtype  : pe_req.vtype,
+             vl     : pe_req.vl / NrLanes / ELEN,
+-            vstart : vfu_operation_d.vstart,
++            vstart : pe_req.vstart / (NrLanes * ELEN),
+             hazard : pe_req.hazard_vm | pe_req.hazard_vd,
+             target_fu : ALU_SLDU,
+             conv      : OpQueueConversionNone,
+@@ -610,6 +612,8 @@
+           // extra operand regardless of whether it is valid in this lane or not.
+           if (operand_request[MaskM].vl * NrLanes * ELEN != pe_req.vl)
+             operand_request[MaskM].vl += 1;
++          // MaskM counts 64-bit words per lane; vstart selects the first word.
++          operand_request[MaskM].vl -= operand_request[MaskM].vstart;
+           operand_request_push[MaskM] = !pe_req.vm;
+ 
+           // Store indexed

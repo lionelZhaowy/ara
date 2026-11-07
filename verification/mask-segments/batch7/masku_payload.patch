@@ -1,0 +1,26 @@
+--- a/hardware/src/masku/masku.sv
++++ b/hardware/src/masku/masku.sv
+@@ -1626,6 +1626,23 @@
+         if (pe_req_i.op == VSLIDEUP && !pe_req_i.use_scalar_op)
+           commit_cnt_d -= vlen_t'(trimmed_stride);
+       end
++
++      // Memory vstart may skip full data payloads, but mask strobes still
++      // start at the first intersecting payload (not at element vstart).
++      if (!pe_req_i.vm && (pe_req_i.vfu inside {VFU_LoadUnit, VFU_StoreUnit}) &&
++          pe_req_i.vstart != '0) begin
++        automatic int unsigned mask_payload_log2 =
++          $clog2(NrLanes) + int'(EW64) - int'(pe_req_i.vtype.vsew);
++        automatic vlen_t aligned_vstart =
++          (pe_req_i.vstart >> mask_payload_log2) << mask_payload_log2;
++        if (vinsn_queue_d.issue_cnt == '0) begin
++          read_cnt_d = pe_req_i.vl - aligned_vstart;
++          mask_pnt_d = aligned_vstart % (NrLanes * DataWidth);
++        end
++        if (vinsn_queue_d.commit_cnt == '0)
++          commit_cnt_d = pe_req_i.vl - aligned_vstart;
++      end
++
+ 
+       // Bump pointers and counters of the vector instruction queue
+       vinsn_queue_d.issue_cnt += 1;
