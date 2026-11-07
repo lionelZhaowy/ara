@@ -132,6 +132,27 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
     endcase
   endfunction : prev_prev_ew
 
+  // Physical registers occupied by an EMUL, including fractional groups.
+  function automatic logic [3:0] physical_regs(vlmul_e lmul);
+    unique case (lmul)
+      LMUL_2: physical_regs = 4'd2;
+      LMUL_4: physical_regs = 4'd4;
+      LMUL_8: physical_regs = 4'd8;
+      default: physical_regs = 4'd1;
+    endcase
+  endfunction : physical_regs
+
+  // Match the six integer-extension selectors. The original CPU request stays
+  // stable while RESHUFFLE holds req_ready low, so this also selects its limit.
+  function automatic vlmul_e extension_source_lmul(vlmul_e lmul, logic [4:0] selector);
+    unique case (selector)
+      5'b00010, 5'b00011: extension_source_lmul = prev_lmul(prev_lmul(prev_lmul(lmul)));
+      5'b00100, 5'b00101: extension_source_lmul = prev_lmul(prev_lmul(lmul));
+      5'b00110, 5'b00111: extension_source_lmul = prev_lmul(lmul);
+      default: extension_source_lmul = LMUL_RSVD;
+    endcase
+  endfunction : extension_source_lmul
+
   /////////////////////////
   //  Backend interface  //
   /////////////////////////
@@ -257,6 +278,9 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
   logic null_vslideup;
   // Does the selected reg group for the selected EMUL have same EEW encoding?
   logic is_same_eew;
+  logic is_integer_extension;
+  vlmul_e extension_emul;
+  logic [3:0] extension_src_regs;
 
   // Pipeline the VLSU's load and store complete signals, for timing reasons
   logic load_complete, load_complete_q;
@@ -371,6 +395,8 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
   elen_t vfmvfs_result;
 
   always_comb begin: p_decoder
+    automatic rvv_instruction_t extension_insn = rvv_instruction_t'(instr.instr);
+
     // Default values
     csr_vstart_d     = csr_vstart_q;
     csr_vl_d         = csr_vl_q;
@@ -380,6 +406,13 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
     eew_valid_d  = eew_valid_q;
     lmul_vs2     = csr_vtype_q.vlmul;
     lmul_vs1     = csr_vtype_q.vlmul;
+    is_integer_extension = (instr.itype.opcode == riscv::OpcodeVec) &&
+      (extension_insn.varith_type.func3 == OPMVV) &&
+      (extension_insn.varith_type.func6 == 6'b010010) &&
+      (extension_insn.varith_type.rs1 inside {5'b00010, 5'b00011, 5'b00100,
+                                            5'b00101, 5'b00110, 5'b00111});
+    extension_emul = extension_source_lmul(csr_vtype_q.vlmul, extension_insn.varith_type.rs1);
+    extension_src_regs = physical_regs(extension_emul);
 
     reshuffle_req_d     = reshuffle_req_q;
     eew_old_buffer_d    = eew_old_buffer_q;
@@ -546,6 +579,11 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                 eew_old_buffer_d = eew_q[insn.vmem_type.rs2];
                 eew_new_buffer_d = reshuffle_eew_vs2_q;
                 vs_buffer_d      = insn.varith_type.rs2;
+                if (is_integer_extension) begin
+                  rs_lmul_cnt_limit_d = 3'(extension_src_regs - 1'b1);
+                  rs_mask_request_d = !eew_valid_q[vs_buffer_d] ||
+                                      (eew_new_buffer_d == eew_old_buffer_d);
+                end
               end
               3'b100: begin
                 eew_old_buffer_d = eew_q[insn.vmem_type.rs1];
@@ -597,7 +635,9 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
             endcase
 
             // Mask the next request if we don't need to reshuffle the next reg
-            if (eew_new_buffer_d == eew_old_buffer_d) rs_mask_request_d = 1'b1;
+            if (eew_new_buffer_d == eew_old_buffer_d ||
+                (is_integer_extension && reshuffle_req_d[1] && !reshuffle_req_d[0] &&
+                 !eew_valid_q[vs_buffer_d])) rs_mask_request_d = 1'b1;
           end
         end
       end
@@ -3641,6 +3681,19 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
         reshuffle_req_d = {ara_req.use_vs1 && (ara_req.eew_vs1    != eew_q[ara_req.vs1]) && eew_valid_q[ara_req.vs1] && (in_lane_op || (is_vstore && ((csr_vstart_q != '0) || !is_same_eew))),
                            ara_req.use_vs2 && (ara_req.eew_vs2    != eew_q[ara_req.vs2]) && eew_valid_q[ara_req.vs2] && in_lane_op,
                            ara_req.use_vd  && (ara_req.vtype.vsew != eew_q[ara_req.vd ]) && eew_valid_q[ara_req.vd ] && !(csr_vstart_q == 0 && (csr_vl_q == ((VLENB << ara_req.emul[1:0]) >> ara_req.vtype.vsew)))};
+        if (is_integer_extension) begin
+          // Source EMUL can be smaller than destination EMUL. Check the entire
+          // bounded source group, including a mixed-EEW group whose first member
+          // is already correct. This change is limited to the six extensions.
+          reshuffle_req_d[1] = 1'b0;
+          for (int unsigned i = 0; i < 8; i++) begin
+            if (i < int'(extension_src_regs) && (int'(ara_req.vs2) + i) < 32) begin
+              if (eew_valid_q[int'(ara_req.vs2) + i] &&
+                  eew_q[int'(ara_req.vs2) + i] != ara_req.eew_vs2)
+                reshuffle_req_d[1] = ara_req.use_vs2;
+            end
+          end
+        end
         // Mask out requests if they refer to the same register!
         reshuffle_req_d &= {
           (insn.varith_type.rs1 != insn.varith_type.rs2) && (insn.varith_type.rs1 != insn.varith_type.rd),
@@ -3686,6 +3739,13 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
           LMUL_8:  rs_lmul_cnt_limit_d = 7;
           default: rs_lmul_cnt_limit_d = 0;
         endcase
+
+        // Initial selection can be vs2 directly (not only vd followed by vs2).
+        if (is_integer_extension && !reshuffle_req_d[0] && reshuffle_req_d[1]) begin
+          rs_lmul_cnt_limit_d = 3'(extension_src_regs - 1'b1);
+          rs_mask_request_d = !eew_valid_q[vs_buffer_d] ||
+                              (eew_new_buffer_d == eew_old_buffer_d);
+        end
 
         // Save info for next reshuffles
         reshuffle_eew_vs1_d = ara_req.eew_vs1;
