@@ -108,7 +108,7 @@ Each ML/A NF2 call checks all 926 words and 9279 comparisons.
 Each completes all three phases, returns native target zero, and ends normally.
 The actual retired final fence has empty store queues, empty WT buffer, accelerator consistency, and zero late writes.
 Independent event checks match accepted requests, physical VRF words, mask payloads, per-lane cut ownership, actual consumption, and complete drain.
-Thirteen actual-signature mutations and six actual-event mutations fail for each passing input.
+Each passing NF5 input rejects thirteen actual-signature mutations. Each passing NF2 input rejects fourteen, including the repeated-first-mask-word control. Each passing input also rejects six actual-event mutations.
 
 The eight O/L calls reach the 20 ms HDL limit with known incorrect mask packets or stale owners.
 They are functional failures with a retained HDL cutoff. We do not classify them as time-only failures.
@@ -198,3 +198,5 @@ A process exit, an incomplete export, or a software summary alone cannot establi
 These inputs cover the stated segment-generated internal starts at architectural `vstart=0`.
 They do not establish architectural nonzero-vstart, fault restart, other lane/VLEN configurations, or all NF/SEW/LMUL combinations.
 The complete three-phase input preserves queues between targets and includes the inverse-mask transition and unmasked control.
+
+The [fixed public composition sources](../COMMANDS.md#fixed-public-sources-for-combination-j) identify all four patches, seven C inputs, definitions, observer sources, and ELF-binding tables used by J.
