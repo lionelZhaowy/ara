@@ -173,3 +173,5 @@ The current public C, observers, and checkers were used for the new builds and r
 Combination J adds the segment-decode and local mask fixes to I. It passes the rebuilt `idx64_vl3` and `idx_nf2` ELFs with the same full signatures, final-fence/drain checks, normal completion, and assertion checks. This establishes only those two compositions.
 
 The DC script logic, RTL, packages, and wrapper types are byte-identical to their accepted versions. Only public variable labels changed. The generic lane results above are reused evidence, not new synthesis runs.
+
+The [fixed public composition sources](../COMMANDS.md#fixed-public-sources-for-combination-j) identify all four patches, seven C inputs, definitions, observer sources, and ELF-binding tables used by J.
