@@ -2,7 +2,7 @@
 
 ## Fixed source and tools
 
-Use separate source copies at Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`. Keep the unchanged `Bender.lock` dependencies and CVA6 HPDcache gitlink. The source variants contain only the patches stated in each batch report. Do not add an unrelated repair stack.
+Use separate source copies at Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`. Keep the unchanged `Bender.lock` dependencies and CVA6 HPDcache gitlink. The source variants contain only the patches stated in the input report. Do not add an unrelated repair stack.
 
 | Locked dependency | Commit |
 | --- | --- |
@@ -21,7 +21,7 @@ Set `ARA_ROOT` to the selected source copy, `PUBLIC_ROOT` to this material direc
 
 ## Software Make targets
 
-The applicable official entry is `apps/<name>/main.c` with a `bin/<name>` Make target. For batch 6, copy [segment_rs2/main.c](batch6/segment_rs2/main.c) to `apps/segment_rs2/main.c` in the isolated checkout. Run:
+The applicable official entry is `apps/<name>/main.c` with a `bin/<name>` Make target. Copy [segment_rs2/main.c](cases/segment_rs2/main.c) to `apps/segment_rs2/main.c` in the isolated checkout. Run:
 
 ```bash
 cd "$ARA_ROOT"
@@ -32,10 +32,10 @@ llvm_args=(
   RISCV_STRIP=true
 )
 make -C apps "${llvm_args[@]}" \
-  bin/segment_rs2 bin/rv64uv-ara-vl1r bin/rv64uv-ara-vs1r
+  ENV_DEFINES= bin/segment_rs2
 ```
 
-The official runtime enables vector state before user-mode `main`. The final C inputs do not write machine-mode `mstatus` from `main`. The first batch 6 draft did so and produced two setup failures; those calls are not part of the four final RTL results. The final programs use ordinary arrays and the official return path, with no private address alias or startup macro.
+The official runtime enables vector state before user-mode `main`. The final C inputs do not write machine-mode `mstatus` from `main`. The first draft did so and produced two setup failures; those calls are not part of the earlier accepted results. The final programs use ordinary arrays and the official return path, with no private address alias or startup macro.
 
 Compile each RTL input once and retain its exact ELF and hash across the compared RTL source variants. The ELF PC and memory addresses below belong to those retained bytes. A rebuild requires a new symbol and fence-PC check.
 
@@ -72,27 +72,28 @@ Each recorded call had its own output directory. The existing UCLI command file,
 
 ```tcl
 run 20 ms
+run 0 ns
 quit
 ```
 
-The wall limit was 600 seconds per call. Run serially without waveforms. `ara_tb` accepts `PRELOAD`; it has no `TIMEOUT` or `MAX_CYCLES` plusarg. A UCLI cutoff can return host status zero and execute final export code without a native test completion. It is not a PASS.
+The wall limit was 600 seconds per call. Use independent writable directories without waveforms. `ara_tb` accepts `PRELOAD`; it has no `TIMEOUT` or `MAX_CYCLES` plusarg. A UCLI cutoff can return host status zero and execute final export code without a native test completion. It is not a PASS.
 
-For the batch 6 RTL ELF with SHA256 `aeccd2080e628c835be08575169395ebf9ae7552fe5fd742c04dab0956186c8e`, the recorded probe arguments are:
+For the rebuilt RTL ELF with SHA256 `78566c43a40623bc8a3a142e05f10b5378b162ccdb64d656cbf3705c1ee2d4bd`, the recorded probe arguments are:
 
 ```bash
 probe_args=(
-  -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/segment_rs2"
-  +V01_OBSERVER +V01_VECTOR_COMMIT +V01_FENCE_PC=8000108a +V01_REGIONS=3
-  +V01_R0_BASE=80001f00 +V01_R0_WORDS=916 +V01_R0_NAME=v01_segment_rs2_observed
-  +V01_R1_BASE=800031d0 +V01_R1_WORDS=4 +V01_R1_NAME=v01_segment_rs2_counts
-  +V01_R2_BASE=800031e0 +V01_R2_WORDS=8 +V01_R2_NAME=v01_segment_rs2_first_error
+  -no_save -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/segment_rs2"
+  +ARA_TEST_OBSERVER +ARA_TEST_VECTOR_COMMIT +ARA_TEST_FENCE_PC=8000108a +ARA_TEST_REGIONS=3
+  +ARA_TEST_R0_BASE=80001f00 +ARA_TEST_R0_WORDS=916 +ARA_TEST_R0_NAME=ara_test_segment_rs2_observed
+  +ARA_TEST_R1_BASE=80003210 +ARA_TEST_R1_WORDS=4 +ARA_TEST_R1_NAME=ara_test_segment_rs2_counts
+  +ARA_TEST_R2_BASE=80003220 +ARA_TEST_R2_WORDS=8 +ARA_TEST_R2_NAME=ara_test_segment_rs2_first_error
 )
 mkdir -p "$RUN_DIR"
 cd "$RUN_DIR"
 timeout 600 "$BUILD_DIR/simv" "${probe_args[@]}"
 ```
 
-Use the same probe arguments once with original build O and once with candidate build D. O reports native target 6, with six exact data errors. D reports target 0 and PASS. The two candidate-only regressions use no observer-enable plusarg:
+Use the same probe arguments once with original build O and once with candidate build D. O reports native target 6, with six exact data errors. D reports target 0 and PASS. The two earlier accepted candidate-only regressions used no observer-enable plusarg. They are reused with unchanged input and production RTL; their command forms were:
 
 ```bash
 timeout 600 "$BUILD_D/simv" -ucli -do "$LIMIT_TCL" \
@@ -107,18 +108,18 @@ The passive [observer](common/ara_observer.sv) reads the real `ara_tb` DRAM arra
 
 For an accepted completed probe, require one selected retired fence and one native exit. At that fence, check the LSU committed-store queue, write-through buffer, combined empty indication, and accelerator consistency. Reject late writes to any exported region and observer consistency errors. Check the normal testbench finish, native target, full signature, intended vector instruction retirements where recorded, and unexpected assertions. Neither a fence alone nor host return code zero establishes success. Preserve the existing time-zero `axi_inval_filter` warning and the intended original/control failure warnings in the result classification.
 
-The [export checker](common/review_ara_observer.py) checks ELF/symbol binding, completion, memory export, and observer consistency. The batch value checker independently checks architectural data. For batch 6, run from `PUBLIC_ROOT`:
+The [export checker](common/review_ara_observer.py) checks ELF/symbol binding, completion, memory export, and observer consistency. The value checker independently checks architectural data. Run from `PUBLIC_ROOT`:
 
 ```bash
 cd "$PUBLIC_ROOT"
 python3 common/review_ara_observer.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --log "$RUN_O/v01_observer.log" --expect-target 6
+  --log "$RUN_O/ara_test_observer.log" --expect-target 6
 python3 common/review_ara_observer.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --log "$RUN_D/v01_observer.log" --expect-target 0
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --signature "$RUN_O/v01_region_0.hex" --variant baseline
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --signature "$RUN_D/v01_region_0.hex" --variant candidate
+  --log "$RUN_D/ara_test_observer.log" --expect-target 0
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
+  --signature "$RUN_O/ara_test_region_0.hex" --variant baseline
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
+  --signature "$RUN_D/ara_test_region_0.hex" --variant candidate
 ```
 
 ## Separate Spike runtime and linker adaptation
@@ -136,12 +137,14 @@ cd "$RUN_SPIKE"
   --priv=msu --pmpregions=0 +signature=signature.hex +signature-granularity=4 \
   "$ARA_ROOT/apps/bin/segment_rs2.spike"
 cd "$PUBLIC_ROOT"
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2.spike" \
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2.spike" \
   --signature "$RUN_SPIKE/signature.hex" --variant candidate
 ```
 
 ## Module implementation checks
 
-The [DC instructions](common/dc/README.md) specify the fixed packages, dependency roots, all-port wrappers, and direct tool entries. Batch 6 completed separate real-dispatcher O/D processes with analyze, elaborate, link, and `compile -no_map`; its [report](batch6/REPRODUCTION.md#dispatcher-implementation-checks) records the accepted generic structural scope and retained warnings. Raw pre-compile black-box flags on native operators and constants were reviewed through their actual attributes; they were not treated as unresolved user IP.
+The [DC instructions](common/dc/README.md) specify the fixed packages, dependency roots, all-port wrappers, and direct tool entries. The earlier campaign completed separate real-dispatcher O/D processes with analyze, elaborate, link, and `compile -no_map`; its [report](cases/REPRODUCTION.md#dispatcher-implementation-checks) records the accepted generic structural scope and retained warnings. Raw pre-compile black-box flags on native operators and constants were reviewed through their actual attributes; they were not treated as unresolved user IP.
 
-This bundle retains the mask observer text compiled in the original segment comparison (SHA256 `0fdc3df529202cc431170a106a72d2e9460d3fa926f4d483136ebe200459416d`). Mask logging was disabled and supplied no result evidence. The active memory observer retained its recorded source. Current public C uses clang-format 20.1.0 with identical canonical C tokens and literal contents. The recorded runs retain the original source hash and ELF bytes, as stated in `batch6/results.json`.
+The renamed passive observers were compiled again for this update. Mask-event logging was disabled in the segment calls and supplies no mask-event evidence. The current public C was compiled again; its source hash equals the actual software-build input hash. The previous public commit retains the old hashes, formatting checks, and original ELF bytes.
+
+The DC script logic, production RTL, packages, and wrapper types are unchanged. Only public environment-variable labels changed. The structural results are earlier accepted generic checks, not new DC invocations.

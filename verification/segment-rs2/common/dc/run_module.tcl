@@ -2,16 +2,16 @@
 # Real Ara module check. Prepared with AI assistance.
 # Use the locked dependencies. This script does not fetch or modify sources.
 set support [file dirname [file normalize [info script]]]
-foreach key {V01_DC_OUTPUT V01_DC_SOURCE V01_DC_ARA_ROOT V01_DC_CVA6_ROOT V01_DC_COMMON_CELLS_ROOT V01_DC_AXI_ROOT V01_DC_FPNEW_ROOT} {
+foreach key {ARA_TEST_DC_OUTPUT ARA_TEST_DC_SOURCE ARA_TEST_DC_ARA_ROOT ARA_TEST_DC_CVA6_ROOT ARA_TEST_DC_COMMON_CELLS_ROOT ARA_TEST_DC_AXI_ROOT ARA_TEST_DC_FPNEW_ROOT} {
     if {![info exists env($key)] || $env($key) eq ""} {error "Missing $key"}
 }
-set out [file normalize $env(V01_DC_OUTPUT)]
-set ara [file normalize $env(V01_DC_ARA_ROOT)]
-set cva6 [file normalize $env(V01_DC_CVA6_ROOT)]
-set cc [file normalize $env(V01_DC_COMMON_CELLS_ROOT)]
-set axi [file normalize $env(V01_DC_AXI_ROOT)]
-set fpnew [file normalize $env(V01_DC_FPNEW_ROOT)]
-set dut_source [file normalize $env(V01_DC_SOURCE)]
+set out [file normalize $env(ARA_TEST_DC_OUTPUT)]
+set ara [file normalize $env(ARA_TEST_DC_ARA_ROOT)]
+set cva6 [file normalize $env(ARA_TEST_DC_CVA6_ROOT)]
+set cc [file normalize $env(ARA_TEST_DC_COMMON_CELLS_ROOT)]
+set axi [file normalize $env(ARA_TEST_DC_AXI_ROOT)]
+set fpnew [file normalize $env(ARA_TEST_DC_FPNEW_ROOT)]
+set dut_source [file normalize $env(ARA_TEST_DC_SOURCE)]
 file mkdir $out/work
 set_app_var search_path [concat [list $support $cc/include $axi/include \
     $ara/hardware/include $cva6/core/include] [get_app_var search_path]]

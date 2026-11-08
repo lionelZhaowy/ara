@@ -38,27 +38,27 @@ struct fixture {
 };
 static struct fixture storage __attribute__((aligned(64)));
 static unsigned cases, checks, vsets, errors;
-volatile uint32_t v01_segment_rs2_counts[4];
-volatile uint64_t v01_segment_rs2_first_error[4];
+volatile uint32_t ara_test_segment_rs2_counts[4];
+volatile uint64_t ara_test_segment_rs2_first_error[4];
 
 /* Every comparison's actual value, in comparison order. No hashes.
  * The independent Python oracle builds the expected 458 values without C
  * conditionals or RTL predicates. The same bytes are exported by Spike.
  */
-__asm__(".pushsection .data.v01_segment_rs2_observed,\"aw\",@progbits\n"
+__asm__(".pushsection .data.ara_test_segment_rs2_observed,\"aw\",@progbits\n"
         ".balign 64\n"
 #ifdef SPIKE
         ".global begin_signature\nbegin_signature:\n"
 #endif
-        ".global v01_segment_rs2_observed\n"
-        ".type v01_segment_rs2_observed,@object\n"
-        "v01_segment_rs2_observed:\n.zero 3664\n"
-        ".size v01_segment_rs2_observed,.-v01_segment_rs2_observed\n"
+        ".global ara_test_segment_rs2_observed\n"
+        ".type ara_test_segment_rs2_observed,@object\n"
+        "ara_test_segment_rs2_observed:\n.zero 3664\n"
+        ".size ara_test_segment_rs2_observed,.-ara_test_segment_rs2_observed\n"
 #ifdef SPIKE
         ".global end_signature\nend_signature:\n"
 #endif
         ".popsection\n");
-extern volatile uint64_t v01_segment_rs2_observed[CHECKS];
+extern volatile uint64_t ara_test_segment_rs2_observed[CHECKS];
 
 static uint64_t guard(unsigned id, unsigned member, unsigned side) {
   return UINT64_C(0x5a3c91e700000000) | ((uint64_t)id << 16) |
@@ -67,14 +67,14 @@ static uint64_t guard(unsigned id, unsigned member, unsigned side) {
 
 static void check(unsigned id, unsigned field, uint64_t got, uint64_t want) {
   if (checks < CHECKS)
-    v01_segment_rs2_observed[checks] = got;
+    ara_test_segment_rs2_observed[checks] = got;
   ++checks;
   if (got != want) {
     if (!errors) {
-      v01_segment_rs2_first_error[0] = id;
-      v01_segment_rs2_first_error[1] = field;
-      v01_segment_rs2_first_error[2] = got;
-      v01_segment_rs2_first_error[3] = want;
+      ara_test_segment_rs2_first_error[0] = id;
+      ara_test_segment_rs2_first_error[1] = field;
+      ara_test_segment_rs2_first_error[2] = got;
+      ara_test_segment_rs2_first_error[3] = want;
     }
     ++errors;
   }
@@ -214,12 +214,12 @@ int main(void) {
   for (unsigned id = 0; id < CASES; ++id)
     run(id);
   check(CASES, 1, cases, CASES);
-  v01_segment_rs2_counts[0] = cases;
-  v01_segment_rs2_counts[1] = checks;
-  v01_segment_rs2_counts[2] = vsets;
-  v01_segment_rs2_counts[3] = errors;
+  ara_test_segment_rs2_counts[0] = cases;
+  ara_test_segment_rs2_counts[1] = checks;
+  ara_test_segment_rs2_counts[2] = vsets;
+  ara_test_segment_rs2_counts[3] = errors;
   __asm__ volatile("fence rw, rw" : : : "memory");
-  printf("V01_SEG_RS2_DONE cases=%u checks=%u vsets=%u errors=%u\n", cases,
+  printf("ARA_TEST_SEG_RS2_DONE cases=%u checks=%u vsets=%u errors=%u\n", cases,
          checks, vsets, errors);
   return (int)errors;
 }

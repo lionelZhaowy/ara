@@ -46,7 +46,7 @@ def records(path):
     rows = []
     for line in path.read_text().splitlines():
         fields = line.split()
-        if not fields or not fields[0].startswith('V01_'):
+        if not fields or not fields[0].startswith('ARA_TEST_'):
             raise ValueError('Unexpected observer log line: '+line)
         row = dict(item.split('=', 1) for item in fields[1:])
         row['kind'] = fields[0]
@@ -57,8 +57,8 @@ def records(path):
 def review(elf, log, expect_target=None, allow_incomplete=False):
     data, symbols, segments = elf_symbols(elf)
     rows = records(log)
-    cfgs = [r for r in rows if r['kind'] == 'V01_CFG']
-    finals = [r for r in rows if r['kind'] == 'V01_FINAL']
+    cfgs = [r for r in rows if r['kind'] == 'ARA_TEST_CFG']
+    finals = [r for r in rows if r['kind'] == 'ARA_TEST_FINAL']
     if len(cfgs) != 1 or len(finals) != 1:
         raise ValueError('Expected one configuration and one final record')
     cfg, final = cfgs[0], finals[0]
@@ -73,12 +73,12 @@ def review(elf, log, expect_target=None, allow_incomplete=False):
     if opcode != 0x0330000f:
         raise ValueError('Selected PC is not fence rw,rw')
     exports = []
-    region_rows = [r for r in rows if r['kind'] == 'V01_REGION']
+    region_rows = [r for r in rows if r['kind'] == 'ARA_TEST_REGION']
     if len(region_rows) != int(cfg['regions']):
         raise ValueError('Region count differs from configuration')
     for i, row in enumerate(region_rows):
         name, base, words = row['name'], int(row['base'], 16), int(row['words'])
-        if int(row['index']) != i or row['file'] != f'v01_region_{i}.hex':
+        if int(row['index']) != i or row['file'] != f'ara_test_region_{i}.hex':
             raise ValueError('Unexpected region index or filename')
         if symbols.get(name) != (base, words*4):
             raise ValueError(f'Region does not match the complete ELF symbol: {name}')
@@ -88,13 +88,13 @@ def review(elf, log, expect_target=None, allow_incomplete=False):
         unknown = sum(not re.fullmatch('[0-9a-fA-F]{8}', w) for w in contents)
         exports.append(dict(symbol=name, base=hex(base), words=words, unknown_words=unknown,
                             file=row['file'], sha256=hashlib.sha256((log.parent/row['file']).read_bytes()).hexdigest()))
-    fences = [r for r in rows if r['kind'] == 'V01_FENCE']
-    exits = [r for r in rows if r['kind'] == 'V01_EXIT']
+    fences = [r for r in rows if r['kind'] == 'ARA_TEST_FENCE']
+    exits = [r for r in rows if r['kind'] == 'ARA_TEST_EXIT']
     if int(final['fences']) != len(fences) or int(final['exits']) != len(exits):
         raise ValueError('Final event counts differ from the actual event records')
     if int(final['late_writes']) or int(final['consistency_errors']):
         raise ValueError('Late result write or accelerator consistency error')
-    if any(r['kind'] in ('V01_LATE_WRITE', 'V01_DUMP_ERROR') for r in rows):
+    if any(r['kind'] in ('ARA_TEST_LATE_WRITE', 'ARA_TEST_DUMP_ERROR') for r in rows):
         raise ValueError('Observer reported a late write or dump error')
     for row in fences:
         if int(row['pc'], 16) != pc or any(row[k] != '1' for k in

@@ -1,6 +1,6 @@
 # Segment rs2 decoding: official Ara comparison
 
-Status: the functional comparison and two real-dispatcher Design Compiler checks completed in isolated official Ara checkouts. The fixed generic structural scope was accepted with the warnings below. The linked fork commit contains the material for the existing issue discussion.
+Status: the public identifiers and case directory were renamed. The input was rebuilt and rebound to its symbols and final fence. Two new official SoC calls reproduce six errors before the patch and zero afterward. One new combination-J call passes. A separate rebuilt Spike ELF passes. The two unchanged official regressions and generic dispatcher checks below are reused from their earlier accepted runs.
 
 ## Source and configuration
 
@@ -8,7 +8,7 @@ Base: Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`. Variant O uses the origina
 
 The fix comes from [David Harris's public patch](https://github.com/davidharrishmc/ara-repros/blob/868f8a21f51f82e8955665fa325526e6a002c182/segment-rs2-x8-v8/fix.patch), linked in [Ara #535](https://github.com/pulp-platform/ara/issues/535). The whole-register `rs2=8` exception applies to unit-stride VLE/VSE. Strided segment instructions with x8 and indexed segment instructions with v8 still require segment expansion. Credit for the fix remains with David Harris.
 
-The C input derives from the separate downstream test. It does not copy the test source from the author's repository. This portable input and the independent checker carry Apache-2.0 identifiers. The RTL retains the Ara source license and authorship. AI tools assisted with the adaptation, test preparation, tool execution, result review, and these notes.
+The C input derives from a separate integration test. It does not copy the test source from the author's repository. This portable input and the independent checker carry Apache-2.0 identifiers. The RTL retains the Ara source license and authorship. AI tools assisted with the adaptation, test preparation, tool execution, result review, and these notes.
 
 The run used the official `2_lanes` configuration: two lanes, VLEN=2048, ELEN=64, write-through D-cache, and zero PMP entries. Dependencies remain at the official lockfile revisions, including CVA6 `99eac9a649001bdf5b8f9da52e0ca73d5c48db1c` and tech_cells_generic `7968dd6e6180df2c644636bc6d2908a49f2190cf`. Tools were LLVM 20.1.0, VCS W-2024.09-SP1, and the Spike installation identified by revision prefix `5cf439b2`.
 
@@ -26,7 +26,7 @@ The platform adaptation uses the official app headers, ordinary arrays, the offi
 
 ## Actual results
 
-The two RTL builds used one identical probe ELF, SHA256 `aeccd2080e628c835be08575169395ebf9ae7552fe5fd742c04dab0956186c8e`.
+The two RTL builds used one identical probe ELF, SHA256 `78566c43a40623bc8a3a142e05f10b5378b162ccdb64d656cbf3705c1ee2d4bd`.
 
 | RTL and input | Cases / checks / vsets | Actual result |
 | --- | --- | --- |
@@ -35,7 +35,7 @@ The two RTL builds used one identical probe ELF, SHA256 `aeccd2080e628c835be0857
 | D, official `rv64uv-ara-vl1r` | Official regression | PASS |
 | D, official `rv64uv-ara-vs1r` | Official regression | PASS |
 
-These four final RTL calls are one reproduced failure and three PASS results. Both regressions reached normal success and finish paths. They check that the legal whole-register load/store exceptions remain valid.
+The two new probe calls are one reproduced failure and one PASS. The two regression calls are earlier accepted results reused with unchanged production RTL and input bytes. Both regressions reached normal success and finish paths. They check that the legal whole-register load/store exceptions remain valid.
 
 Both probes exported all 916 words without unknown values. The independent byte-address oracle found six architectural differences in O and none in D. The six differences occur in cases 0, 2, 4, 6, 8, and 10, which use x8 or v8. All six alternative-register cases match the architecture. For example, case 0 leaves field 1 at `0xe2` instead of loading byte `0x41`; D returns `0x41`.
 
@@ -45,7 +45,7 @@ VCS reported the existing `axi_inval_filter` unmatched `unique case` warning at 
 
 The checker rejected six separate one-bit changes to actual recorded values in each RTL probe. The changes covered vlenb, memory, a vector tail, index readback, a guard, and the completed-case count. These are offline checker controls, not additional RTL runs.
 
-A separate official Spike runtime build used ELF SHA256 `36d8639994971a3dd50a912dc28901cfa929148f4ed9a4244f0f9804169783e0`. It completed with 12 cases, 458 checks, 36 vsets, and zero errors. All 916 signature words match the independent architectural oracle. This ELF differs from the RTL runtime ELF. Both ELFs contain exactly the twelve intended target instruction encodings.
+A separate official Spike runtime build used ELF SHA256 `9367042b010c0b5bf65d3a92f22ee20489936dd25fea634aa944404b6d9eaa4e`. It completed with 12 cases, 458 checks, 36 vsets, and zero errors. All 916 signature words match the independent architectural oracle. This ELF differs from the RTL runtime ELF. Both ELFs contain exactly the twelve intended target instruction encodings.
 
 [results.json](results.json) binds the final input, patch, checker, ELFs, simulator executables, exported data, and results by SHA256.
 
@@ -68,7 +68,7 @@ This is an accepted generic structural check of the real dispatcher. It is not a
 
 | Files | Role |
 | --- | --- |
-| [segment_rs2/main.c](segment_rs2/main.c) | Public formatting revision of the twelve-case input used for the RTL and separate Spike runtime builds |
+| [segment_rs2/main.c](segment_rs2/main.c) | Exact twelve-case source used for the rebuilt RTL and separate Spike runtime ELFs |
 | [segment_decode.patch](segment_decode.patch) | David Harris's two functional decode conditions, applied to the fixed official base |
 | [check_segment_rs2.py](check_segment_rs2.py) | Independent byte-address data model and actual ELF encoding checks |
 | [ara_observer.sv](../common/ara_observer.sv), [review_ara_observer.py](../common/review_ara_observer.py) | Passive real-DRAM export and ELF/fence/completion checks |
@@ -79,7 +79,7 @@ This is an accepted generic structural check of the real dispatcher. It is not a
 
 The hardware support files retain the original Solderpad notices and authors. The new C/Python and Tcl support use Apache-2.0 identifiers. The unchanged dependency sources come from the pinned official checkout. The two DC source lists are identical except for O's versus D's `hardware/src/ara_dispatcher.sv`; they contain the real packages, common-cell counters/popcount, segment sequencer, public types, DUT, and wrapper.
 
-The actual runs compiled C source SHA256 `5a88275ab0f947cba711f011f3f8c99caebdfadfb284055968c6bb3afd06cdba`. The public source removes a stale header comment and uses LLVM 20.1.0 clang-format. Its SHA256 is `4e6efc36cbec5297981151ed55187aa413f3053eba18e3a7c37bf02c8542593a`. A comparison after standard C line splicing and adjacent-string concatenation found the same complete token stream and literal contents. Original sources and ELFs remain retained. These comment and format changes caused no software build or RTL run.
+The current public C was compiled again for both runtimes. The new source, ELF, observer, checker, export, and simulator hashes are bound in results.json. The old source-formatting equivalence records and original ELF hashes remain in the previous public commit.
 
 ## Retained setup failures
 
@@ -97,26 +97,24 @@ The actual software command follows, with installation paths replaced by `$LLVM_
 make -C apps config=2_lanes LLVM_INSTALL_DIR="$LLVM_ROOT" \
   LLVM_FLAGS="--target=riscv64-unknown-elf --sysroot=$LLVM_ROOT/riscv64-unknown-elf -isystem $LLVM_ROOT/riscv64-unknown-elf/include -march=rv64gcv_zfh_zvfh -mabi=lp64d -mno-relax -fuse-ld=lld --rtlib=compiler-rt -L$LLVM_ROOT/riscv64-unknown-elf/lib" \
   LLVM_V_FLAGS="-fno-vectorize -fno-slp-vectorize -mno-implicit-float" \
-  RISCV_STRIP=true bin/segment_rs2 bin/rv64uv-ara-vl1r bin/rv64uv-ara-vs1r
+  RISCV_STRIP=true ENV_DEFINES= bin/segment_rs2
 ```
 
 For these exact RTL ELF bytes, the selected arguments were:
 
 ```bash
 probe_args=(
-  -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/segment_rs2"
-  +V01_OBSERVER +V01_VECTOR_COMMIT +V01_FENCE_PC=8000108a +V01_REGIONS=3
-  +V01_R0_BASE=80001f00 +V01_R0_WORDS=916 +V01_R0_NAME=v01_segment_rs2_observed
-  +V01_R1_BASE=800031d0 +V01_R1_WORDS=4 +V01_R1_NAME=v01_segment_rs2_counts
-  +V01_R2_BASE=800031e0 +V01_R2_WORDS=8 +V01_R2_NAME=v01_segment_rs2_first_error
+  -no_save -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/segment_rs2"
+  +ARA_TEST_OBSERVER +ARA_TEST_VECTOR_COMMIT +ARA_TEST_FENCE_PC=8000108a +ARA_TEST_REGIONS=3
+  +ARA_TEST_R0_BASE=80001f00 +ARA_TEST_R0_WORDS=916 +ARA_TEST_R0_NAME=ara_test_segment_rs2_observed
+  +ARA_TEST_R1_BASE=80003210 +ARA_TEST_R1_WORDS=4 +ARA_TEST_R1_NAME=ara_test_segment_rs2_counts
+  +ARA_TEST_R2_BASE=80003220 +ARA_TEST_R2_WORDS=8 +ARA_TEST_R2_NAME=ara_test_segment_rs2_first_error
 )
-"$BUILD_O/simv" "${probe_args[@]}"
-"$BUILD_D/simv" "${probe_args[@]}"
-"$BUILD_D/simv" -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/rv64uv-ara-vl1r"
-"$BUILD_D/simv" -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/rv64uv-ara-vs1r"
+timeout 600 "$BUILD_O/simv" "${probe_args[@]}"
+timeout 600 "$BUILD_D/simv" "${probe_args[@]}"
 ```
 
-Each call used a separate output directory. `$LIMIT_TCL` contains `run 20 ms` followed by `quit`. These addresses and the fence PC belong to the quoted ELF; obtain them again from ELF symbols and instruction decoding after any rebuild.
+Each call used a separate output directory. `$LIMIT_TCL` contains `run 20 ms`, `run 0 ns`, and `quit`. These addresses and the fence PC belong to the quoted ELF; obtain them again from ELF symbols and instruction decoding after any rebuild.
 
 For Spike, apply the section-wildcard patch, then use the same software command with only target `bin/segment_rs2.spike`. The official Spike target also enables vector state in its startup code. Run:
 
@@ -130,14 +128,14 @@ From the public material directory, the offline checks are:
 
 ```bash
 python3 common/review_ara_observer.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --log "$RUN_O/v01_observer.log" --expect-target 6
+  --log "$RUN_O/ara_test_observer.log" --expect-target 6
 python3 common/review_ara_observer.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --log "$RUN_D/v01_observer.log" --expect-target 0
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --signature "$RUN_O/v01_region_0.hex" --variant baseline
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
-  --signature "$RUN_D/v01_region_0.hex" --variant candidate
-python3 batch6/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2.spike" \
+  --log "$RUN_D/ara_test_observer.log" --expect-target 0
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
+  --signature "$RUN_O/ara_test_region_0.hex" --variant baseline
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2" \
+  --signature "$RUN_D/ara_test_region_0.hex" --variant candidate
+python3 cases/check_segment_rs2.py --elf "$ARA_ROOT/apps/bin/segment_rs2.spike" \
   --signature "$RUN_SPIKE/signature.hex" --variant candidate
 ```
 
@@ -146,14 +144,14 @@ The checker's `baseline` mode confirms the exact known failure values. Its `PASS
 The actual DC entry was `dc_shell -f <public>/common/dc/check_dispatcher.tcl`. With the dependency roots set as described in the [DC instructions](../common/dc/README.md), the two calls are:
 
 ```bash
-V01_DC_SOURCE="$ARA_ROOT/hardware/src/ara_dispatcher.sv" \
-  V01_DC_OUTPUT="$DC_O" dc_shell -f "$PUBLIC_ROOT/common/dc/check_dispatcher.tcl"
-V01_DC_SOURCE="$ARA_D_ROOT/hardware/src/ara_dispatcher.sv" \
-  V01_DC_OUTPUT="$DC_D" dc_shell -f "$PUBLIC_ROOT/common/dc/check_dispatcher.tcl"
+ARA_TEST_DC_SOURCE="$ARA_ROOT/hardware/src/ara_dispatcher.sv" \
+  ARA_TEST_DC_OUTPUT="$DC_O" dc_shell -f "$PUBLIC_ROOT/common/dc/check_dispatcher.tcl"
+ARA_TEST_DC_SOURCE="$ARA_D_ROOT/hardware/src/ara_dispatcher.sv" \
+  ARA_TEST_DC_OUTPUT="$DC_D" dc_shell -f "$PUBLIC_ROOT/common/dc/check_dispatcher.tcl"
 ```
 
-The shared package/dependency root is the original fixed checkout in both calls; only `V01_DC_SOURCE` selects the candidate DUT. `$DC_O` and `$DC_D` are separate absolute output directories. The entry reads the selected sources and creates reports; it does not fetch or change dependencies.
+The shared package/dependency root is the original fixed checkout in both calls; only `ARA_TEST_DC_SOURCE` selects the candidate DUT. `$DC_O` and `$DC_D` are separate absolute output directories. The entry reads the selected sources and creates reports; it does not fetch or change dependencies.
 
 ## Limits
 
-This functional comparison covers the stated NF2/VL1 forms. It does not establish complete NF4 behavior. The complete downstream NF4 program also required a separate masked-memory change, tracked with #529. The earlier downstream runs remain separate and are not counted as official Ara runs here. The two dispatcher DC runs cover the fixed generic structural scope above. Publication remains pending.
+This functional comparison covers the stated NF2/VL1 forms. It does not establish complete NF4 behavior. A separate NF4 integration program also required a separate masked-memory change, tracked with #529. Those earlier integration runs remain separate and are not counted as official Ara runs here. The two dispatcher DC runs cover the fixed generic structural scope above. Combination J adds the independent index-EEW and local mask changes to D. Its new call uses this same rebuilt probe ELF and passes the complete 916-word oracle, final-fence/drain, normal native completion, and assertion checks. No complete upstream patch or larger NF configuration is claimed. The generic dispatcher checks and the two unchanged official regressions are reused evidence; this update has no new DC invocation.

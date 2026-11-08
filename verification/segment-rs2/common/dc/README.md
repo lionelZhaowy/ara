@@ -3,7 +3,7 @@
 These files prepare real module checks for Ara
 `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, two lanes, VLEN=2048, ELEN=64.
 The wrappers expose every DUT port. They use no stubs or functional tie-offs.
-The initial local preparation did not run DC. Two real dispatcher calls later completed and were accepted. See [the actual dispatcher results](../../batch6/REPRODUCTION.md#dispatcher-implementation-checks). Lane and MASKU results are tracked separately while the remaining checks run.
+The initial local preparation did not run DC. Two real dispatcher calls later completed and were accepted. See [the actual dispatcher results](../../cases/REPRODUCTION.md#dispatcher-implementation-checks). Lane and MASKU results are tracked separately while the remaining checks run.
 
 `ara_dc_types.sv` retains the exact request/response structs from `ara.sv`,
 the exact three lane structs from `lane.sv`, and the exact configuration
@@ -22,9 +22,9 @@ Use these unchanged dependency commits from the Ara lockfile:
 | AXI | `853ede23b2a9837951b74dbdc6d18c3eef5bac7d` |
 | FPnew | `e5aa6a01b5bbe1675c3aa8872e1203413ded83d1` |
 
-Set `V01_DC_ARA_ROOT`, `V01_DC_CVA6_ROOT`, `V01_DC_COMMON_CELLS_ROOT`,
-`V01_DC_AXI_ROOT`, and `V01_DC_FPNEW_ROOT` to those existing source roots.
-Set `V01_DC_SOURCE` to the exact compared DUT file and `V01_DC_OUTPUT` to
+Set `ARA_TEST_DC_ARA_ROOT`, `ARA_TEST_DC_CVA6_ROOT`, `ARA_TEST_DC_COMMON_CELLS_ROOT`,
+`ARA_TEST_DC_AXI_ROOT`, and `ARA_TEST_DC_FPNEW_ROOT` to those existing source roots.
+Set `ARA_TEST_DC_SOURCE` to the exact compared DUT file and `ARA_TEST_DC_OUTPUT` to
 a separate absolute output directory for each design. Retain the source
 hashes and original tool logs with each result. Use the installed DC library
 search path for `gtech.db` and `standard.sldb`.
