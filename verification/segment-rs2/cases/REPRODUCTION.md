@@ -155,3 +155,5 @@ The shared package/dependency root is the original fixed checkout in both calls;
 ## Limits
 
 This functional comparison covers the stated NF2/VL1 forms. It does not establish complete NF4 behavior. A separate NF4 integration program also required a separate masked-memory change, tracked with #529. Those earlier integration runs remain separate and are not counted as official Ara runs here. The two dispatcher DC runs cover the fixed generic structural scope above. Combination J adds the independent index-EEW and local mask changes to D. Its new call uses this same rebuilt probe ELF and passes the complete 916-word oracle, final-fence/drain, normal native completion, and assertion checks. No complete upstream patch or larger NF configuration is claimed. The generic dispatcher checks and the two unchanged official regressions are reused evidence; this update has no new DC invocation.
+
+The [fixed public composition sources](../COMMANDS.md#fixed-public-sources-for-combination-j) identify all four patches, seven C inputs, definitions, observer sources, and ELF-binding tables used by J.

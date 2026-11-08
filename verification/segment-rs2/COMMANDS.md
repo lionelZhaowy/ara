@@ -148,3 +148,47 @@ The [DC instructions](common/dc/README.md) specify the fixed packages, dependenc
 The renamed passive observers were compiled again for this update. Mask-event logging was disabled in the segment calls and supplies no mask-event evidence. The current public C was compiled again; its source hash equals the actual software-build input hash. The previous public commit retains the old hashes, formatting checks, and original ELF bytes.
 
 The DC script logic, production RTL, packages, and wrapper types are unchanged. Only public environment-variable labels changed. The structural results are earlier accepted generic checks, not new DC invocations.
+
+## Fixed public sources for combination J
+
+Combination J starts from the same official base and locked dependencies.
+Its production changes apply these four patches, in order:
+
+1. [Index-EEW patch](https://github.com/lionelZhaowy/ara/blob/e434b86c00759c9bc474e050edc720315b4cb62b/verification/index-eew/cases/index_eew.patch).
+2. [Segment-decode patch](https://github.com/lionelZhaowy/ara/blob/d0f57f2eb2f25f21646578c7784007ab4690d665/verification/segment-rs2/cases/segment_decode.patch), credited to David Harris.
+3. [Local lane mask-word patch](https://github.com/lionelZhaowy/ara/blob/c48eef7abf6f45b959b6002c68780411b757217a/verification/mask-segments/cases/lane_mask_words.patch).
+4. [Local mask-unit payload patch](https://github.com/lionelZhaowy/ara/blob/c48eef7abf6f45b959b6002c68780411b757217a/verification/mask-segments/cases/masku_payload.patch).
+
+These links select fixed source commits. They do not select moving branch names.
+The comparison excludes the rejected scale-only control, slide changes, and unrelated repairs.
+Set `INDEX_PUBLIC`, `SEGMENT_PUBLIC`, and `MASK_PUBLIC` to local copies of these three fixed material directories.
+For a fresh isolated official source copy, apply:
+
+```bash
+cd "$ARA_ROOT"
+git apply "$INDEX_PUBLIC/cases/index_eew.patch"
+git apply "$SEGMENT_PUBLIC/cases/segment_decode.patch"
+git apply "$MASK_PUBLIC/cases/lane_mask_words.patch"
+git apply "$MASK_PUBLIC/cases/masku_payload.patch"
+```
+
+Build J with the [mask comparison's passive observers and official VCS recipe](https://github.com/lionelZhaowy/ara/blob/c48eef7abf6f45b959b6002c68780411b757217a/verification/mask-segments/COMMANDS.md#rtl-variants-and-build).
+The seven input sources and definitions are:
+
+| App | Exact source | Compile definitions |
+| --- | --- | --- |
+| `idx64_vl3` | [index NF1 C](https://github.com/lionelZhaowy/ara/blob/e434b86c00759c9bc474e050edc720315b4cb62b/verification/index-eew/cases/index_nf1/main.c) | `-DARA_TEST_FIRST=12 -DARA_TEST_COUNT=1 -DARA_TEST_TEST_VL=3` |
+| `idx_nf2` | [index NF2 C](https://github.com/lionelZhaowy/ara/blob/e434b86c00759c9bc474e050edc720315b4cb62b/verification/index-eew/cases/index_nf2/main.c) | Defaults, no extra definitions |
+| `segment_rs2` | [segment C](https://github.com/lionelZhaowy/ara/blob/d0f57f2eb2f25f21646578c7784007ab4690d665/verification/segment-rs2/cases/segment_rs2/main.c) | No extra definitions |
+| `mask_nf5_load` | [mask C](https://github.com/lionelZhaowy/ara/blob/c48eef7abf6f45b959b6002c68780411b757217a/verification/mask-segments/cases/mask_segments/main.c) | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF5_E64_VL3=1` |
+| `mask_nf5_store` | Same mask C | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF5_E64_VL3=1` |
+| `mask_nf2_load` | Same mask C | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF2_E8_VL129=1` |
+| `mask_nf2_store` | Same mask C | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF2_E8_VL129=1` |
+
+Copy each source to its distinct `apps/<app>/main.c` path.
+Use the recorded LLVM flags and preserve one common rebuilt ELF per app across the relevant variants.
+The [index completion table](https://github.com/lionelZhaowy/ara/blob/e434b86c00759c9bc474e050edc720315b4cb62b/verification/index-eew/cases/REPRODUCTION.md#actual-commands), [segment arguments](https://github.com/lionelZhaowy/ara/blob/d0f57f2eb2f25f21646578c7784007ab4690d665/verification/segment-rs2/cases/REPRODUCTION.md#commands-used), and [mask binding table](https://github.com/lionelZhaowy/ara/blob/c48eef7abf6f45b959b6002c68780411b757217a/verification/mask-segments/cases/REPRODUCTION.md#actual-final-fence-bindings) give the exact final fences and export regions.
+The fixed commits' `cases/results.json` files contain their actual ELF hashes, complete signatures, and run arguments.
+After any rebuild, repeat the symbol, footer-store, and completion-path checks rather than copying these PCs to different ELF bytes.
+J's complete-value and event checks use the corresponding public checkers from these same fixed directories.
+Use a separate writable output directory for each call and retain the finite HDL and wall limits.
