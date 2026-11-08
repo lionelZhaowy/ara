@@ -16,58 +16,58 @@
 #define STR_I(x) #x
 #define STR(x) STR_I(x)
 /* Exactly two diagnostic shapes, independently built for unit load/store. */
-#ifndef V01_FAMILY
-#error V01_FAMILY_required
+#ifndef ARA_TEST_FAMILY
+#error ARA_TEST_FAMILY_required
 #endif
-#if V01_FAMILY != 1 && V01_FAMILY != 2
+#if ARA_TEST_FAMILY != 1 && ARA_TEST_FAMILY != 2
 #error diagnostic_requires_unit_load_or_store
 #endif
-#ifndef V01_NF5_E64_VL3
-#define V01_NF5_E64_VL3 0
+#ifndef ARA_TEST_NF5_E64_VL3
+#define ARA_TEST_NF5_E64_VL3 0
 #endif
-#ifndef V01_NF2_E8_VL129
-#define V01_NF2_E8_VL129 0
+#ifndef ARA_TEST_NF2_E8_VL129
+#define ARA_TEST_NF2_E8_VL129 0
 #endif
-#if (V01_NF5_E64_VL3 != 0 && V01_NF5_E64_VL3 != 1) ||                          \
-    (V01_NF2_E8_VL129 != 0 && V01_NF2_E8_VL129 != 1) ||                        \
-    (V01_NF5_E64_VL3 + V01_NF2_E8_VL129 != 1)
+#if (ARA_TEST_NF5_E64_VL3 != 0 && ARA_TEST_NF5_E64_VL3 != 1) ||                          \
+    (ARA_TEST_NF2_E8_VL129 != 0 && ARA_TEST_NF2_E8_VL129 != 1) ||                        \
+    (ARA_TEST_NF5_E64_VL3 + ARA_TEST_NF2_E8_VL129 != 1)
 #error select_exactly_one_fixed_diagnostic
 #endif
-#if V01_NF5_E64_VL3
-#define V01_FIXED_NFIELDS 5
-#define V01_SELECTED_VL 3
-#define V01_SELECTED_CASE 7
+#if ARA_TEST_NF5_E64_VL3
+#define ARA_TEST_FIXED_NFIELDS 5
+#define ARA_TEST_SELECTED_VL 3
+#define ARA_TEST_SELECTED_CASE 7
 #else
-#define V01_FIXED_NFIELDS 2
-#define V01_SELECTED_VL 129
-#define V01_SELECTED_CASE 1
+#define ARA_TEST_FIXED_NFIELDS 2
+#define ARA_TEST_SELECTED_VL 129
+#define ARA_TEST_SELECTED_CASE 1
 #endif
-#ifndef V01_NFIELDS
-#define V01_NFIELDS V01_FIXED_NFIELDS
+#ifndef ARA_TEST_NFIELDS
+#define ARA_TEST_NFIELDS ARA_TEST_FIXED_NFIELDS
 #endif
-#if V01_NFIELDS != V01_FIXED_NFIELDS
+#if ARA_TEST_NFIELDS != ARA_TEST_FIXED_NFIELDS
 #error NF_must_match_the_selected_fixed_diagnostic
 #endif
-#ifndef V01_EEW_MASK
-#define V01_EEW_MASK 15
+#ifndef ARA_TEST_EEW_MASK
+#define ARA_TEST_EEW_MASK 15
 #endif
-#if V01_EEW_MASK != 15
+#if ARA_TEST_EEW_MASK != 15
 #error preserve_original_compiled_EEW_mask
 #endif
-#define IS_STORE ((V01_FAMILY % 2) == 0)
-#define IS_INDEXED (V01_FAMILY >= 5)
+#define IS_STORE ((ARA_TEST_FAMILY % 2) == 0)
+#define IS_INDEXED (ARA_TEST_FAMILY >= 5)
 #define REGISTER_BYTES 256
 #define MEMORY_BYTES 512
 #define INDEX_BYTES 512
 #define MASK_BYTES 256
 #define WIDTHS                                                                 \
-  (((V01_EEW_MASK >> 0) & 1) + ((V01_EEW_MASK >> 1) & 1) +                     \
-   ((V01_EEW_MASK >> 2) & 1) + ((V01_EEW_MASK >> 3) & 1))
+  (((ARA_TEST_EEW_MASK >> 0) & 1) + ((ARA_TEST_EEW_MASK >> 1) & 1) +                     \
+   ((ARA_TEST_EEW_MASK >> 2) & 1) + ((ARA_TEST_EEW_MASK >> 3) & 1))
 #define CASES 3
 #define HEADER_WORDS 16
 #define METADATA_WORDS 16
 #define GUARD_WORDS 28
-#define CASE_WORDS (METADATA_WORDS + V01_NFIELDS * 64 + 128 + GUARD_WORDS)
+#define CASE_WORDS (METADATA_WORDS + ARA_TEST_NFIELDS * 64 + 128 + GUARD_WORDS)
 #define FOOTER_WORDS 10
 #define SIGNATURE_WORDS (HEADER_WORDS + CASES * CASE_WORDS + FOOTER_WORDS)
 #define SIGNATURE_BYTES (4 * SIGNATURE_WORDS)
@@ -82,25 +82,25 @@
  * All payload bytes are packed little-endian in words; no result hashes.
  */
 __asm__(
-    ".pushsection .data.v01_memory_gap_signature,\"aw\",@progbits\n"
+    ".pushsection .data.ara_test_memory_gap_signature,\"aw\",@progbits\n"
     ".balign 64\n"
 #ifdef SPIKE
     ".global begin_signature\nbegin_signature:\n"
 #endif
-    ".global v01_memory_gap_signature\n.type v01_memory_gap_signature,@object\n"
-    "v01_memory_gap_signature:\n.zero " STR(
+    ".global ara_test_memory_gap_signature\n.type ara_test_memory_gap_signature,@object\n"
+    "ara_test_memory_gap_signature:\n.zero " STR(
         SIGNATURE_BYTES) "\n"
                          ".size "
-                         "v01_memory_gap_signature,.-v01_memory_gap_signature\n"
+                         "ara_test_memory_gap_signature,.-ara_test_memory_gap_signature\n"
 #ifdef SPIKE
                          ".global end_signature\nend_signature:\n"
 #endif
                          ".popsection\n");
-extern volatile uint32_t v01_memory_gap_signature[SIGNATURE_WORDS];
+extern volatile uint32_t ara_test_memory_gap_signature[SIGNATURE_WORDS];
 
 struct register_image {
   uint64_t before;
-  uint8_t data[V01_NFIELDS * REGISTER_BYTES];
+  uint8_t data[ARA_TEST_NFIELDS * REGISTER_BYTES];
   uint64_t after;
 };
 struct memory_image {
@@ -126,9 +126,9 @@ struct fixture {
 };
 static struct fixture storage __attribute__((aligned(64)));
 static unsigned checks, failures, completed;
-volatile uint64_t v01_memory_gap_first_error[5];
+volatile uint64_t ara_test_memory_gap_first_error[5];
 /* Passive observers may read this symbol. It never controls the DUT. */
-volatile uint32_t v01_memory_gap_phase = UINT32_MAX;
+volatile uint32_t ara_test_memory_gap_phase = UINT32_MAX;
 struct result {
   uintptr_t returned, vl, vt, vs, data_max, index_max;
 };
@@ -145,15 +145,15 @@ static void check(unsigned id, unsigned field, unsigned byte, uint64_t got,
   ++checks;
   if (got != want) {
     if (!failures) {
-      v01_memory_gap_first_error[0] = id;
-      v01_memory_gap_first_error[1] = field;
-      v01_memory_gap_first_error[2] = byte;
-      v01_memory_gap_first_error[3] = got;
-      v01_memory_gap_first_error[4] = want;
+      ara_test_memory_gap_first_error[0] = id;
+      ara_test_memory_gap_first_error[1] = field;
+      ara_test_memory_gap_first_error[2] = byte;
+      ara_test_memory_gap_first_error[3] = got;
+      ara_test_memory_gap_first_error[4] = want;
 #ifndef SPIKE
-      printf("V01_MEMGAP_FIRST_FAIL family=%u nf=%u id=%u field=%u byte=%u "
+      printf("ARA_TEST_MEMGAP_FIRST_FAIL family=%u nf=%u id=%u field=%u byte=%u "
              "got=%08x:%08x want=%08x:%08x\n",
-             V01_FAMILY, V01_NFIELDS, id, field, byte, (unsigned)(got >> 32),
+             ARA_TEST_FAMILY, ARA_TEST_NFIELDS, id, field, byte, (unsigned)(got >> 32),
              (unsigned)got, (unsigned)(want >> 32), (unsigned)want);
 #endif
     }
@@ -172,7 +172,7 @@ static uint8_t memory_byte(unsigned id, unsigned byte) {
  * before any mask-bit lookup. The e8 case changes its second 128-bit word.
  */
 static uint8_t original_mask_byte(unsigned byte) {
-#if V01_NF5_E64_VL3
+#if ARA_TEST_NF5_E64_VL3
   (void)byte;
   return UINT8_C(0xa6);
 #else
@@ -189,7 +189,7 @@ static uint8_t diagnostic_mask_byte(unsigned phase, unsigned byte) {
 }
 static unsigned diagnostic_active(unsigned phase, unsigned element,
                                   unsigned masked) {
-  return element < V01_SELECTED_VL &&
+  return element < ARA_TEST_SELECTED_VL &&
          (!masked ||
           ((diagnostic_mask_byte(phase, element / 8) >> (element % 8)) & 1U));
 }
@@ -203,7 +203,7 @@ static uint64_t guard(unsigned id, unsigned which, unsigned after) {
  * also stay in bounds so wrong-tail writes have an exact in-fixture oracle.
  */
 static unsigned index_offset(unsigned element) {
-  return (element % 3) * (V01_NFIELDS + 1) * 4;
+  return (element % 3) * (ARA_TEST_NFIELDS + 1) * 4;
 }
 static uint8_t index_byte(unsigned eew, unsigned byte) {
   const unsigned bytes = eew / 8;
@@ -213,10 +213,10 @@ static uint8_t index_byte(unsigned eew, unsigned byte) {
 static unsigned element_address(unsigned eew, unsigned element,
                                 unsigned field) {
   const unsigned bytes = IS_INDEXED ? 4 : eew / 8;
-#if V01_FAMILY <= 2
-  return (element * V01_NFIELDS + field) * bytes;
-#elif V01_FAMILY <= 4
-  return (element * (V01_NFIELDS + 1) + field) * bytes;
+#if ARA_TEST_FAMILY <= 2
+  return (element * ARA_TEST_NFIELDS + field) * bytes;
+#elif ARA_TEST_FAMILY <= 4
+  return (element * (ARA_TEST_NFIELDS + 1) + field) * bytes;
 #else
   return index_offset(element) + field * bytes;
 #endif
@@ -257,22 +257,22 @@ static unsigned element_address(unsigned eew, unsigned element,
 #define INDEX_SAVE(W) ""
 #define DATA_WIDTH(W) W
 #endif
-#if V01_FAMILY == 1
-#define TARGET(W) "vlseg" STR(V01_NFIELDS) "e" STR(W) ".v v8, (%[memory])"
-#elif V01_FAMILY == 2
-#define TARGET(W) "vsseg" STR(V01_NFIELDS) "e" STR(W) ".v v8, (%[memory])"
-#elif V01_FAMILY == 3
+#if ARA_TEST_FAMILY == 1
+#define TARGET(W) "vlseg" STR(ARA_TEST_NFIELDS) "e" STR(W) ".v v8, (%[memory])"
+#elif ARA_TEST_FAMILY == 2
+#define TARGET(W) "vsseg" STR(ARA_TEST_NFIELDS) "e" STR(W) ".v v8, (%[memory])"
+#elif ARA_TEST_FAMILY == 3
 #define TARGET(W)                                                              \
-  "vlsseg" STR(V01_NFIELDS) "e" STR(W) ".v v8, (%[memory]), %[stride]"
-#elif V01_FAMILY == 4
+  "vlsseg" STR(ARA_TEST_NFIELDS) "e" STR(W) ".v v8, (%[memory]), %[stride]"
+#elif ARA_TEST_FAMILY == 4
 #define TARGET(W)                                                              \
-  "vssseg" STR(V01_NFIELDS) "e" STR(W) ".v v8, (%[memory]), %[stride]"
-#elif V01_FAMILY == 5
+  "vssseg" STR(ARA_TEST_NFIELDS) "e" STR(W) ".v v8, (%[memory]), %[stride]"
+#elif ARA_TEST_FAMILY == 5
 #define TARGET(W)                                                              \
-  "vluxseg" STR(V01_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4"
+  "vluxseg" STR(ARA_TEST_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4"
 #else
 #define TARGET(W)                                                              \
-  "vsuxseg" STR(V01_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4"
+  "vsuxseg" STR(ARA_TEST_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4"
 #endif
 #define EXEC(W, M, SUFFIX)                                                     \
   __asm__ volatile(                                                            \
@@ -285,7 +285,7 @@ static unsigned element_address(unsigned eew, unsigned element,
       "li t1, 225\nvmv.v.x v4, t1\n" INDEX_PREP(                               \
           W, M) "vsetvli %[dmax], "                                            \
                 "zero, e" STR(DATA_WIDTH(W)) ", m1, tu, mu\n" FIELD_LIST(      \
-                    V01_NFIELDS, LOAD_FIELD,                                   \
+                    ARA_TEST_NFIELDS, LOAD_FIELD,                                   \
                     DATA_WIDTH(W)) "vsetvli "                                  \
                                    "%["                                        \
                                    "returned],"                                \
@@ -296,7 +296,7 @@ static unsigned element_address(unsigned eew, unsigned element,
       "fence rw, rw\n"                                                         \
       "csrr %[vl], vl\ncsrr %[vt], vtype\ncsrr %[vs], vstart\n"                \
       "vsetvli t0, zero, e" STR(DATA_WIDTH(W)) ", m1, tu, mu\n" FIELD_LIST(    \
-          V01_NFIELDS, STORE_FIELD, DATA_WIDTH(W))                             \
+          ARA_TEST_NFIELDS, STORE_FIELD, DATA_WIDTH(W))                             \
           INDEX_SAVE(W) "vsetvli t0, zero, e8, m1, tu, mu\n"                   \
                         "vse8.v v0, (%[mask_out])\n"                           \
                         "fence rw, rw\n"                                       \
@@ -306,8 +306,8 @@ static unsigned element_address(unsigned eew, unsigned element,
         [memory] "r"(p->memory.data), [mask] "r"(p->mask.data),                \
         [mask_out] "r"(p->mask_out.data), [index] "r"(p->index.data),          \
         [index_out] "r"(p->index_out.data),                                    \
-        [avl] "r"((uintptr_t)V01_SELECTED_VL),                                 \
-        [stride] "r"((uintptr_t)((V01_NFIELDS + 1) * (W / 8)))                 \
+        [avl] "r"((uintptr_t)ARA_TEST_SELECTED_VL),                                 \
+        [stride] "r"((uintptr_t)((ARA_TEST_NFIELDS + 1) * (W / 8)))                 \
       : "t0", "t1", "v0", "v1", "v2", "v3", "v4", "v5", "v8", "v9", "v10",     \
         "v11", "v12", "v13", "v14", "v15", "memory")
 #define WIDTH_CASE(BIT, W, M)                                                  \
@@ -320,46 +320,46 @@ static unsigned element_address(unsigned eew, unsigned element,
 static struct result execute(unsigned id, volatile struct fixture *p) {
   struct result r = {0};
   switch (id) {
-#if V01_EEW_MASK & 1
+#if ARA_TEST_EEW_MASK & 1
     WIDTH_CASE(0, 8, mf4);
 #endif
-#if V01_EEW_MASK & 2
+#if ARA_TEST_EEW_MASK & 2
     WIDTH_CASE(1, 16, mf2);
 #endif
-#if V01_EEW_MASK & 4
+#if ARA_TEST_EEW_MASK & 4
     WIDTH_CASE(2, 32, m1);
 #endif
-#if V01_EEW_MASK & 8
+#if ARA_TEST_EEW_MASK & 8
     WIDTH_CASE(3, 64, m2);
 #endif
   }
   return r;
 }
 static void put64(unsigned word, uint64_t value) {
-  v01_memory_gap_signature[word] = (uint32_t)value;
-  v01_memory_gap_signature[word + 1] = (uint32_t)(value >> 32);
+  ara_test_memory_gap_signature[word] = (uint32_t)value;
+  ara_test_memory_gap_signature[word + 1] = (uint32_t)(value >> 32);
 }
 static void save_bytes(unsigned word, volatile const uint8_t *bytes,
                        unsigned size) {
   for (unsigned i = 0; i < size; i += 4)
-    v01_memory_gap_signature[word + i / 4] =
+    ara_test_memory_gap_signature[word + i / 4] =
         (uint32_t)bytes[i] | ((uint32_t)bytes[i + 1] << 8) |
         ((uint32_t)bytes[i + 2] << 16) | ((uint32_t)bytes[i + 3] << 24);
 }
 static void run(unsigned phase) {
-  const unsigned id = V01_SELECTED_CASE + 8 * phase;
-  const unsigned eew = 8U << (V01_SELECTED_CASE / 2), masked = phase < 2;
-  v01_memory_gap_phase = phase;
+  const unsigned id = ARA_TEST_SELECTED_CASE + 8 * phase;
+  const unsigned eew = 8U << (ARA_TEST_SELECTED_CASE / 2), masked = phase < 2;
+  ara_test_memory_gap_phase = phase;
   const unsigned sew = IS_INDEXED ? 32 : eew, bytes = sew / 8;
   const unsigned base = HEADER_WORDS + completed * CASE_WORDS;
   const unsigned previous = failures;
   volatile struct fixture *p = (&storage);
-  v01_memory_gap_signature[base] = id;
-  v01_memory_gap_signature[base + 1] = eew;
-  v01_memory_gap_signature[base + 2] = sew;
-  v01_memory_gap_signature[base + 3] = masked;
-  v01_memory_gap_signature[base + 4] = 1;
-  for (unsigned f = 0; f < V01_NFIELDS; ++f)
+  ara_test_memory_gap_signature[base] = id;
+  ara_test_memory_gap_signature[base + 1] = eew;
+  ara_test_memory_gap_signature[base + 2] = sew;
+  ara_test_memory_gap_signature[base + 3] = masked;
+  ara_test_memory_gap_signature[base + 4] = 1;
+  for (unsigned f = 0; f < ARA_TEST_NFIELDS; ++f)
     for (unsigned i = 0; i < REGISTER_BYTES; ++i) {
       p->old.data[f * REGISTER_BYTES + i] = old_byte(id, f, i);
       p->out.data[f * REGISTER_BYTES + i] = UINT8_C(0xcc);
@@ -387,18 +387,18 @@ static void run(unsigned phase) {
 #undef INIT_GUARD
 
 #ifndef SPIKE
-  printf("V01_MEMGAP_PHASE_BEGIN phase=%u id=%u family=%u nf=%u masked=%u\n",
-         phase, id, V01_FAMILY, V01_NFIELDS, masked);
+  printf("ARA_TEST_MEMGAP_PHASE_BEGIN phase=%u id=%u family=%u nf=%u masked=%u\n",
+         phase, id, ARA_TEST_FAMILY, ARA_TEST_NFIELDS, masked);
 #endif
   /* Every setup/export instruction is unmasked. No reset or queue clear. */
-  const struct result r = execute(V01_SELECTED_CASE - (masked ? 0 : 1), p);
-  check(id, 0, 0, r.returned, V01_SELECTED_VL);
-  check(id, 1, 0, r.vl, V01_SELECTED_VL);
-  check(id, 2, 0, r.vt, (IS_INDEXED ? 2 : V01_SELECTED_CASE / 2) * 8);
+  const struct result r = execute(ARA_TEST_SELECTED_CASE - (masked ? 0 : 1), p);
+  check(id, 0, 0, r.returned, ARA_TEST_SELECTED_VL);
+  check(id, 1, 0, r.vl, ARA_TEST_SELECTED_VL);
+  check(id, 2, 0, r.vt, (IS_INDEXED ? 2 : ARA_TEST_SELECTED_CASE / 2) * 8);
   check(id, 3, 0, r.vs, 0);
   check(id, 4, 0, r.data_max, REGISTER_BYTES / bytes);
   check(id, 5, 0, r.index_max, IS_INDEXED ? 64 : 0);
-  for (unsigned f = 0; f < V01_NFIELDS; ++f)
+  for (unsigned f = 0; f < ARA_TEST_NFIELDS; ++f)
     for (unsigned i = 0; i < REGISTER_BYTES; ++i) {
       const unsigned element = i / bytes, subbyte = i % bytes;
       const unsigned active = diagnostic_active(phase, element, masked);
@@ -414,9 +414,9 @@ static void run(unsigned phase) {
   for (unsigned i = 0; i < MEMORY_BYTES; ++i) {
     uint8_t wanted = memory_byte(id, i);
     if (IS_STORE)
-      for (unsigned e = 0; e < V01_SELECTED_VL; ++e)
+      for (unsigned e = 0; e < ARA_TEST_SELECTED_VL; ++e)
         if (diagnostic_active(phase, e, masked))
-          for (unsigned f = 0; f < V01_NFIELDS; ++f) {
+          for (unsigned f = 0; f < ARA_TEST_NFIELDS; ++f) {
             const unsigned address = element_address(eew, e, f);
             if (i >= address && i < address + bytes)
               wanted = old_byte(id, f, e * bytes + i - address);
@@ -432,7 +432,7 @@ static void run(unsigned phase) {
     check(id, 12, i, p->mask.data[i], diagnostic_mask_byte(phase, i));
     check(id, 13, i, p->mask_out.data[i], diagnostic_mask_byte(phase, i));
   }
-  unsigned guards = base + METADATA_WORDS + V01_NFIELDS * 64 + 128;
+  unsigned guards = base + METADATA_WORDS + ARA_TEST_NFIELDS * 64 + 128;
 #define CHECK_GUARD(MEMBER, WHICH)                                             \
   check(id, 14, 2 * WHICH, p->MEMBER.before, guard(id, WHICH, 0));             \
   check(id, 14, 2 * WHICH + 1, p->MEMBER.after, guard(id, WHICH, 1));          \
@@ -446,21 +446,21 @@ static void run(unsigned phase) {
   CHECK_GUARD(mask, 5);
   CHECK_GUARD(mask_out, 6);
 #undef CHECK_GUARD
-  save_bytes(base + METADATA_WORDS, p->out.data, V01_NFIELDS * REGISTER_BYTES);
-  save_bytes(base + METADATA_WORDS + V01_NFIELDS * 64, p->memory.data,
+  save_bytes(base + METADATA_WORDS, p->out.data, ARA_TEST_NFIELDS * REGISTER_BYTES);
+  save_bytes(base + METADATA_WORDS + ARA_TEST_NFIELDS * 64, p->memory.data,
              MEMORY_BYTES);
-  v01_memory_gap_signature[base + 5] = failures - previous;
+  ara_test_memory_gap_signature[base + 5] = failures - previous;
   put64(base + 6, r.returned);
   put64(base + 8, r.vl);
   put64(base + 10, r.vt);
   put64(base + 12, r.vs);
-  v01_memory_gap_signature[base + 14] = (uint32_t)r.data_max;
-  v01_memory_gap_signature[base + 15] = (uint32_t)r.index_max;
-  v01_memory_gap_signature[base + 4] = failures == previous ? 2 : 3;
+  ara_test_memory_gap_signature[base + 14] = (uint32_t)r.data_max;
+  ara_test_memory_gap_signature[base + 15] = (uint32_t)r.index_max;
+  ara_test_memory_gap_signature[base + 4] = failures == previous ? 2 : 3;
   ++completed;
 #ifndef SPIKE
   printf(
-      "V01_MEMGAP_PHASE_DONE phase=%u id=%u checks=%u errors=%u completed=%u\n",
+      "ARA_TEST_MEMGAP_PHASE_DONE phase=%u id=%u checks=%u errors=%u completed=%u\n",
       phase, id, checks, failures - previous, completed);
 #endif
 }
@@ -469,17 +469,17 @@ int main(void) {
   __asm__ volatile("csrw vstart, zero" ::: "memory");
   __asm__ volatile("csrr %0, vlenb" : "=r"(vlenb));
   for (unsigned i = 0; i < SIGNATURE_WORDS; ++i)
-    v01_memory_gap_signature[i] = 0;
-  v01_memory_gap_signature[0] = UINT32_C(0x56314d47);
-  v01_memory_gap_signature[1] = 2;
-  v01_memory_gap_signature[2] = V01_FAMILY;
-  v01_memory_gap_signature[3] = V01_NFIELDS;
-  v01_memory_gap_signature[4] = V01_EEW_MASK;
-  v01_memory_gap_signature[5] = CASES;
-  v01_memory_gap_signature[6] = (uint32_t)vlenb;
-  v01_memory_gap_signature[10] = CASE_WORDS;
-  v01_memory_gap_signature[11] = SIGNATURE_WORDS;
-  v01_memory_gap_signature[12] = V01_SELECTED_VL;
+    ara_test_memory_gap_signature[i] = 0;
+  ara_test_memory_gap_signature[0] = UINT32_C(0x56314d47);
+  ara_test_memory_gap_signature[1] = 2;
+  ara_test_memory_gap_signature[2] = ARA_TEST_FAMILY;
+  ara_test_memory_gap_signature[3] = ARA_TEST_NFIELDS;
+  ara_test_memory_gap_signature[4] = ARA_TEST_EEW_MASK;
+  ara_test_memory_gap_signature[5] = CASES;
+  ara_test_memory_gap_signature[6] = (uint32_t)vlenb;
+  ara_test_memory_gap_signature[10] = CASE_WORDS;
+  ara_test_memory_gap_signature[11] = SIGNATURE_WORDS;
+  ara_test_memory_gap_signature[12] = ARA_TEST_SELECTED_VL;
   check(8, 15, 0, vlenb, REGISTER_BYTES);
   check(8, 16, 0, (uintptr_t)&storage % 64 == 0, 1);
   if (!failures) {
@@ -489,21 +489,21 @@ int main(void) {
   }
 #ifndef SPIKE
   else
-    printf("V01_MEMGAP_ENVIRONMENT_FAIL checks=%u errors=%u\n", checks,
+    printf("ARA_TEST_MEMGAP_ENVIRONMENT_FAIL checks=%u errors=%u\n", checks,
            failures);
 #endif
   check(8, 17, 0, completed, CASES);
-  v01_memory_gap_signature[7] = checks;
-  v01_memory_gap_signature[8] = failures;
-  v01_memory_gap_signature[9] = completed;
+  ara_test_memory_gap_signature[7] = checks;
+  ara_test_memory_gap_signature[8] = failures;
+  ara_test_memory_gap_signature[9] = completed;
   for (unsigned i = 0; i < 5; ++i)
     put64(HEADER_WORDS + CASES * CASE_WORDS + 2 * i,
-          v01_memory_gap_first_error[i]);
+          ara_test_memory_gap_first_error[i]);
   __asm__ volatile("fence rw, rw" ::: "memory");
 #ifndef SPIKE
-  printf("V01_MEMGAP_DONE family=%u nf=%u eewmask=%u cases=%u checks=%u "
+  printf("ARA_TEST_MEMGAP_DONE family=%u nf=%u eewmask=%u cases=%u checks=%u "
          "errors=%u\n",
-         V01_FAMILY, V01_NFIELDS, V01_EEW_MASK, completed, checks, failures);
+         ARA_TEST_FAMILY, ARA_TEST_NFIELDS, ARA_TEST_EEW_MASK, completed, checks, failures);
 #endif
   return failures ? 97 : 0;
 }

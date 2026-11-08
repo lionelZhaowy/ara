@@ -1,10 +1,10 @@
 # Masked segment-memory comparison on official Ara
 
-The tests compare current Ara main `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, David Harris's complete proposal, and separate local MASKU/lane changes.
+The tests compare fixed official Ara base `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, David Harris's complete proposal, and separate local MASKU/lane changes.
 The official configuration is `2_lanes`, VLEN=2048, ELEN=64, WT D-cache, and zero PMP entries.
 Architectural `vstart` remains zero. Segment expansion produces the internal start offsets.
 
-See [the complete input and reproduction description](batch7/REPRODUCTION.md), [commands](COMMANDS.md), and [recorded results](batch7/results.json).
+See [the complete input and reproduction description](cases/REPRODUCTION.md), [commands](COMMANDS.md), and [recorded results](cases/results.json).
 The four inputs execute original-mask, inverse-mask, and unmasked phases in one run.
 The observers are passive. They read real DUT state and testbench memory without driving the DUT.
 

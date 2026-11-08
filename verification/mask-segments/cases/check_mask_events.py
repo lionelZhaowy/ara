@@ -26,8 +26,8 @@ LAYOUT = {
     64: tuple(range(16)),
 }
 META = ("id", "vd", "sew", "vl", "vstart")
-PHASE_BEGIN = "V01_MEMGAP_PHASE_BEGIN"
-PHASE_DONE = "V01_MEMGAP_PHASE_DONE"
+PHASE_BEGIN = "ARA_TEST_MEMGAP_PHASE_BEGIN"
+PHASE_DONE = "ARA_TEST_MEMGAP_PHASE_DONE"
 
 
 def interval(sew, start, end):
@@ -116,7 +116,7 @@ def parse_log(path):
     rows = []
     phase = None
     for number, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
-        match = re.search(r"\b(V01_MASK_[A-Z_]+|V01_MEMGAP_PHASE_BEGIN|V01_MEMGAP_PHASE_DONE|V01_MEMGAP_ENVIRONMENT_FAIL|V01_MEMGAP_DONE)\s+(.*)", line)
+        match = re.search(r"\b(ARA_TEST_MASK_[A-Z_]+|ARA_TEST_MEMGAP_PHASE_BEGIN|ARA_TEST_MEMGAP_PHASE_DONE|ARA_TEST_MEMGAP_ENVIRONMENT_FAIL|ARA_TEST_MEMGAP_DONE)\s+(.*)", line)
         if not match:
             continue
         row = {"event": match[1], "line": number, "phase": phase}
@@ -188,7 +188,7 @@ class Review:
             self.window = (starts[0], ends[0] if ends else float("inf"))
         ordinals = Counter()
         for row in rows:
-            if row["event"] != "V01_MASK_UNIT_ACCEPT":
+            if row["event"] != "ARA_TEST_MASK_UNIT_ACCEPT":
                 continue
             owner = dict(row, owner=len(self.owners))
             phase = owner["phase"]
@@ -409,23 +409,23 @@ class Review:
                 cycles[row["cycle"]].append(row)
         for cycle in sorted(cycles):
             group = cycles[cycle]
-            if not self.transition_states and any(r["event"] == "V01_MASK_UNIT_ACCEPT" and r["phase"] == 1 for r in group):
+            if not self.transition_states and any(r["event"] == "ARA_TEST_MASK_UNIT_ACCEPT" and r["phase"] == 1 for r in group):
                 self.transition_states.append(self.stage_state(1, cycle))
             # All values sample q-state before this edge. Cross-always display
             # ordering is not a hardware ordering. Retire before replacement.
-            for event, function in (("V01_MASK_LANE_HANDSHAKE", self.handshake),
-                                    ("V01_MASK_LANE_PUSH", self.lane_push),
-                                    ("V01_MASK_VRF_READ", self.vrf_read),
-                                    ("V01_MASK_VRF_RETURN", self.vrf_return),
-                                    ("V01_MASK_UNIT_CONSUME", self.consume),
-                                    ("V01_MASK_UNIT_CUT_FILL", self.fill),
-                                    ("V01_MASK_UNIT_PREFETCH", self.prefetch),
-                                    ("V01_MASK_UNIT_EMIT", self.emit)):
+            for event, function in (("ARA_TEST_MASK_LANE_HANDSHAKE", self.handshake),
+                                    ("ARA_TEST_MASK_LANE_PUSH", self.lane_push),
+                                    ("ARA_TEST_MASK_VRF_READ", self.vrf_read),
+                                    ("ARA_TEST_MASK_VRF_RETURN", self.vrf_return),
+                                    ("ARA_TEST_MASK_UNIT_CONSUME", self.consume),
+                                    ("ARA_TEST_MASK_UNIT_CUT_FILL", self.fill),
+                                    ("ARA_TEST_MASK_UNIT_PREFETCH", self.prefetch),
+                                    ("ARA_TEST_MASK_UNIT_EMIT", self.emit)):
                 for row in group:
                     if row["event"] == event:
                         function(row)
             for row in group:
-                if row["event"] == "V01_MASK_UNIT_DONE":
+                if row["event"] == "ARA_TEST_MASK_UNIT_DONE":
                     origin = self.origin(row, False)
                     if origin is not None:
                         if origin["owner"] in self.done:
@@ -437,13 +437,13 @@ class Review:
 
     def finish(self, rows):
         counts = Counter(r["event"] for r in rows)
-        lane_ready = [r for r in rows if r["event"] == "V01_MASK_LANE_READY"]
-        unit_ready = [r for r in rows if r["event"] == "V01_MASK_UNIT_READY"]
+        lane_ready = [r for r in rows if r["event"] == "ARA_TEST_MASK_LANE_READY"]
+        unit_ready = [r for r in rows if r["event"] == "ARA_TEST_MASK_UNIT_READY"]
         if len(lane_ready) != 2 or {r["lane"] for r in lane_ready} != {0, 1} or any((r["lanes"], r["vlenbits"]) != (2, 12) for r in lane_ready):
             self.fail("Missing exact two-lane configuration observations")
         if len(unit_ready) != 1 or (unit_ready[0]["lanes"], unit_ready[0]["depth"], unit_ready[0]["vlenbits"]) != (2, 1, 12):
             self.fail("Missing actual MASKU depth-one configuration")
-        if not counts["V01_MASK_RESET"]:
+        if not counts["ARA_TEST_MASK_RESET"]:
             self.fail("Observer lacks reset-disturbance records")
         begins = [r for r in rows if r["event"] == PHASE_BEGIN]
         ends = [r for r in rows if r["event"] == PHASE_DONE]
@@ -465,9 +465,9 @@ class Review:
             if row["errors"]:
                 self.difference("software_phase_errors", row, errors=row["errors"], phase=row["phase"])
         for lane in (0, 1):
-            finals = [r for r in rows if r["event"] == "V01_MASK_LANE_SUMMARY" and r["lane"] == lane]
+            finals = [r for r in rows if r["event"] == "ARA_TEST_MASK_LANE_SUMMARY" and r["lane"] == lane]
             if not finals and self.incomplete:
-                finals = [r for r in rows if r["event"] == "V01_MASK_LANE_SNAPSHOT" and r["lane"] == lane]
+                finals = [r for r in rows if r["event"] == "ARA_TEST_MASK_LANE_SNAPSHOT" and r["lane"] == lane]
             if len(finals) != 1:
                 self.fail("Missing unique actual lane final or incomplete-run snapshot")
             else:
@@ -479,10 +479,10 @@ class Review:
             if any(part in row["event"] for part in ("HOLD_ERROR", "OVERWRITE", "LANE_FLUSH")):
                 self.fail("Actual request hold/overwrite/flush failure", row)
             if begins and row["line"] >= begins[0]["line"] and (len(ends) < 3 or row["line"] <= ends[-1]["line"]):
-                if row["event"] in ("V01_MASK_RESET", "V01_MASK_FLUSH", "V01_MASK_OTHER_ACCEPT"):
+                if row["event"] in ("ARA_TEST_MASK_RESET", "ARA_TEST_MASK_FLUSH", "ARA_TEST_MASK_OTHER_ACCEPT"):
                     self.difference("phase_disturbance", row, event=row["event"])
-        summary = [r for r in rows if r["event"] == "V01_MASK_UNIT_SUMMARY"]
-        snapshots = [r for r in rows if r["event"] == "V01_MASK_UNIT_SNAPSHOT"]
+        summary = [r for r in rows if r["event"] == "ARA_TEST_MASK_UNIT_SUMMARY"]
+        snapshots = [r for r in rows if r["event"] == "ARA_TEST_MASK_UNIT_SNAPSHOT"]
         final = summary[0] if len(summary) == 1 else snapshots[0] if self.incomplete and len(snapshots) == 1 else None
         if final is None:
             self.fail("Missing unique actual final summary or incomplete-run snapshot")
@@ -538,14 +538,14 @@ def review(rows, nf, family, incomplete=False):
 
 
 def deadline_binding(rows, deadline_ns):
-    snapshots = [r for r in rows if r["event"] in ("V01_MASK_LANE_SNAPSHOT", "V01_MASK_UNIT_SNAPSHOT")]
+    snapshots = [r for r in rows if r["event"] in ("ARA_TEST_MASK_LANE_SNAPSHOT", "ARA_TEST_MASK_UNIT_SNAPSHOT")]
     if len(snapshots) != 3 or any(r["time_ns"] != deadline_ns for r in snapshots) or len({r["cycle"] for r in snapshots}) != 1:
         raise ValueError("Incomplete diagnosis requires two lane snapshots and one unit snapshot at the exact frozen deadline")
-    units = [r for r in snapshots if r["event"] == "V01_MASK_UNIT_SNAPSHOT"]
-    lanes = [r for r in snapshots if r["event"] == "V01_MASK_LANE_SNAPSHOT"]
+    units = [r for r in snapshots if r["event"] == "ARA_TEST_MASK_UNIT_SNAPSHOT"]
+    lanes = [r for r in snapshots if r["event"] == "ARA_TEST_MASK_LANE_SNAPSHOT"]
     if len(units) != 1 or {r["lane"] for r in lanes} != {0, 1}:
         raise ValueError("Incomplete diagnosis lacks the exact physical unit/lane snapshot set")
-    finals = [r for r in rows if r["event"] in ("V01_MASK_LANE_SUMMARY", "V01_MASK_UNIT_SUMMARY")]
+    finals = [r for r in rows if r["event"] in ("ARA_TEST_MASK_LANE_SUMMARY", "ARA_TEST_MASK_UNIT_SUMMARY")]
     if finals:
         if len(finals) != 3:
             raise ValueError("Incomplete diagnosis contains partial or duplicate actual final summaries")
@@ -564,10 +564,10 @@ def fixture(nf=5, family=1):
     rows = []
     def add(event, phase=None, **fields):
         rows.append(dict(event=event, line=len(rows) + 1, phase=phase, **fields))
-    add("V01_MASK_RESET", cycle=0, level="1", time_ns=15)
-    add("V01_MASK_UNIT_READY", lanes=2, depth=1, vlenbits=12)
+    add("ARA_TEST_MASK_RESET", cycle=0, level="1", time_ns=15)
+    add("ARA_TEST_MASK_UNIT_READY", lanes=2, depth=1, vlenbits=12)
     for lane in (0, 1):
-        add("V01_MASK_LANE_READY", lane=lane, lanes=2, vlenbits=12, reqbits=128)
+        add("ARA_TEST_MASK_LANE_READY", lane=lane, lanes=2, vlenbits=12, reqbits=128)
     sew, vl, selected = (64, 3, 7) if nf == 5 else (8, 129, 1)
     vfu = 4 if family == 1 else 5
     count = 0
@@ -581,42 +581,42 @@ def fixture(nf=5, family=1):
                     count += 1
                     model = interval(sew, element, element + 1)
                     meta = dict(id=count % 8, vd=8 + field, sew={8: 0, 64: 3}[sew], vl=element + 1, vstart=element)
-                    add("V01_MASK_UNIT_ACCEPT", phase, cycle=cycle, serial=count, vfu=vfu, mask_eew=0,
+                    add("ARA_TEST_MASK_UNIT_ACCEPT", phase, cycle=cycle, serial=count, vfu=vfu, mask_eew=0,
                         read_next=model["remaining"], commit_next=model["remaining"], pointer_next=model["pointer"],
                         issue_queue=0, commit_queue=0, **meta)
                     for lane in (0, 1):
                         request = dict(lane=lane, serial=count, id=meta["id"], start=model["rows"][0], count=len(model["rows"]), eew=3, vs=0, scale=0)
-                        add("V01_MASK_LANE_PUSH", phase, cycle=cycle, pevalid=1, vd=meta["vd"], vfu=vfu,
+                        add("ARA_TEST_MASK_LANE_PUSH", phase, cycle=cycle, pevalid=1, vd=meta["vd"], vfu=vfu,
                             sew=meta["sew"], vl=meta["vl"], vstart=meta["vstart"], **request)
-                        add("V01_MASK_LANE_HANDSHAKE", phase, cycle=cycle + 1, **request)
+                        add("ARA_TEST_MASK_LANE_HANDSHAKE", phase, cycle=cycle + 1, **request)
                     word = model["rows"][0]
                     operand = 0
                     for lane in (0, 1):
                         data = physical_vrf_word(nf, phase, word, lane)
                         operand |= data << (lane * 64)
-                        add("V01_MASK_VRF_READ", phase, cycle=cycle + 2, lane=lane, row=word // 8, bank=word % 8)
-                        add("V01_MASK_VRF_RETURN", phase, cycle=cycle + 3, lane=lane, data_bits=format(data, "064b"))
+                        add("ARA_TEST_MASK_VRF_READ", phase, cycle=cycle + 2, lane=lane, row=word // 8, bank=word % 8)
+                        add("ARA_TEST_MASK_VRF_RETURN", phase, cycle=cycle + 3, lane=lane, data_bits=format(data, "064b"))
                     mask = architectural_strobe(nf, phase, model["packets"][0], sew)
                     valid = (1 << min(model["remaining"], 2)) - 1
                     slot = (count - 1) % 2
-                    add("V01_MASK_UNIT_EMIT", phase, cycle=cycle + 4, serial=count, mask_eew=0,
+                    add("ARA_TEST_MASK_UNIT_EMIT", phase, cycle=cycle + 4, serial=count, mask_eew=0,
                         read=model["remaining"], pointer=model["pointer"], operand_bits=format(operand, "0128b"),
                         operand_ready_bits="11", mask_bits=format(mask, "016b"), valid_bits=format(valid, "02b"), slot=slot, **meta)
                     for lane in (0, 1):
                         if valid & (1 << lane):
-                            add("V01_MASK_UNIT_CUT_FILL", phase, cycle=cycle + 5, load=int(family == 1), store=int(family == 2),
+                            add("ARA_TEST_MASK_UNIT_CUT_FILL", phase, cycle=cycle + 5, load=int(family == 1), store=int(family == 2),
                                 lane=lane, serial=count, current_masku_id=meta["id"], byte_bits=format((mask >> (lane * 8)) & 255, "08b"), **meta)
-                    add("V01_MASK_UNIT_PREFETCH", phase, cycle=cycle + 5, serial=count, id=meta["id"], valid=format(valid, "x"),
+                    add("ARA_TEST_MASK_UNIT_PREFETCH", phase, cycle=cycle + 5, serial=count, id=meta["id"], valid=format(valid, "x"),
                         mask=format(mask, "04x"), load=int(family == 1), store=int(family == 2), queue=1, slot=slot)
-                    add("V01_MASK_UNIT_CONSUME", phase, cycle=cycle + 6, load=int(family == 1), store=int(family == 2),
+                    add("ARA_TEST_MASK_UNIT_CONSUME", phase, cycle=cycle + 6, load=int(family == 1), store=int(family == 2),
                         valid_bits=format(valid, "02b"), mask_bits=format(mask, "016b"), **meta)
-                    add("V01_MASK_UNIT_DONE", phase, cycle=cycle + 7, serial=count, id=meta["id"], vd=meta["vd"], vl=meta["vl"], vstart=meta["vstart"], queue=0)
+                    add("ARA_TEST_MASK_UNIT_DONE", phase, cycle=cycle + 7, serial=count, id=meta["id"], vd=meta["vd"], vl=meta["vl"], vstart=meta["vstart"], queue=0)
                     cycle += 10
         add(PHASE_DONE, phase, id=selected + 8 * phase, checks=2 + (phase + 1) * check_count, errors=0, completed=phase + 1)
     for lane in (0, 1):
-        add("V01_MASK_LANE_SUMMARY", 2, cycle=cycle, lane=lane, time_ns=cycle, pushes=count,
+        add("ARA_TEST_MASK_LANE_SUMMARY", 2, cycle=cycle, lane=lane, time_ns=cycle, pushes=count,
             handshakes=count, stalls=0, hold_errors=0, pending=0)
-    add("V01_MASK_UNIT_SUMMARY", 2, cycle=cycle, time_ns=cycle, accepted=count, emitted=count,
+    add("ARA_TEST_MASK_UNIT_SUMMARY", 2, cycle=cycle, time_ns=cycle, accepted=count, emitted=count,
         completed=count, queue=0, issue_queue=0, commit_queue=0, read=0, commit=0, pointer=0,
         operand_valid_bits="00", ldu_valid=0, ldu_remaining=0, ldu_cut_valid_bits="00", ldu_cut_ready_bits="11",
         stu_valid=0, stu_remaining=0, stu_cut_valid_bits="00", stu_cut_ready_bits="11")
@@ -632,25 +632,25 @@ def self_test():
             positive = review(rows, nf, family)["assessment"] == "PASS"
             controls = {}
             mutations = {
-                "wrong_slot": ("V01_MASK_UNIT_PREFETCH", "slot", 99),
-                "wrong_cut_byte": ("V01_MASK_UNIT_CUT_FILL", "byte_bits", "xxxxxxxx"),
-                "wrong_return_data": ("V01_MASK_VRF_RETURN", "data_bits", "x" * 64),
-                "wrong_physical_word": ("V01_MASK_VRF_READ", "bank", 7),
-                "phase_interference": ("V01_MASK_UNIT_DONE", "event", "V01_MASK_OTHER_ACCEPT"),
-                "unknown_operand_ready": ("V01_MASK_UNIT_EMIT", "operand_ready_bits", "xx"),
+                "wrong_slot": ("ARA_TEST_MASK_UNIT_PREFETCH", "slot", 99),
+                "wrong_cut_byte": ("ARA_TEST_MASK_UNIT_CUT_FILL", "byte_bits", "xxxxxxxx"),
+                "wrong_return_data": ("ARA_TEST_MASK_VRF_RETURN", "data_bits", "x" * 64),
+                "wrong_physical_word": ("ARA_TEST_MASK_VRF_READ", "bank", 7),
+                "phase_interference": ("ARA_TEST_MASK_UNIT_DONE", "event", "ARA_TEST_MASK_OTHER_ACCEPT"),
+                "unknown_operand_ready": ("ARA_TEST_MASK_UNIT_EMIT", "operand_ready_bits", "xx"),
             }
             for name, (event, key, value) in mutations.items():
                 changed = copy.deepcopy(rows)
                 next(r for r in changed if r["event"] == event)[key] = value
                 controls[name] = review(changed, nf, family)["assessment"] != "PASS"
-            changed = [r for r in rows if r["event"] != "V01_MASK_RESET"]
+            changed = [r for r in rows if r["event"] != "ARA_TEST_MASK_RESET"]
             controls["missing_reset_observation"] = review(changed, nf, family)["assessment"] == "INVALID_EVIDENCE"
             changed = copy.deepcopy(rows)
             for row in changed:
-                if row["event"] in ("V01_MASK_UNIT_CUT_FILL", "V01_MASK_UNIT_EMIT", "V01_MASK_UNIT_PREFETCH"):
+                if row["event"] in ("ARA_TEST_MASK_UNIT_CUT_FILL", "ARA_TEST_MASK_UNIT_EMIT", "ARA_TEST_MASK_UNIT_PREFETCH"):
                     row["current_masku_id"] = 999
                     row["serial"] = 999
-                    if row["event"] == "V01_MASK_UNIT_PREFETCH":
+                    if row["event"] == "ARA_TEST_MASK_UNIT_PREFETCH":
                         row["id"] = 999
             ignored_current_id = review(changed, nf, family)["assessment"] == "PASS"
             lines = []
@@ -678,11 +678,11 @@ def negative_controls(rows, nf, family):
         raise ValueError("Real event controls require a complete passing event stream")
     rejected = {}
     for name, event, key, value in (
-            ("wrong_physical_word", "V01_MASK_VRF_READ", "bank", 7),
-            ("wrong_mask_cut_byte", "V01_MASK_UNIT_CUT_FILL", "byte_bits", "xxxxxxxx"),
-            ("wrong_consumed_byte", "V01_MASK_UNIT_CONSUME", "mask_bits", "x" * 16),
-            ("wrong_prefetched_slot", "V01_MASK_UNIT_PREFETCH", "slot", 99),
-            ("wrong_returned_operand", "V01_MASK_VRF_RETURN", "data_bits", "x" * 64)):
+            ("wrong_physical_word", "ARA_TEST_MASK_VRF_READ", "bank", 7),
+            ("wrong_mask_cut_byte", "ARA_TEST_MASK_UNIT_CUT_FILL", "byte_bits", "xxxxxxxx"),
+            ("wrong_consumed_byte", "ARA_TEST_MASK_UNIT_CONSUME", "mask_bits", "x" * 16),
+            ("wrong_prefetched_slot", "ARA_TEST_MASK_UNIT_PREFETCH", "slot", 99),
+            ("wrong_returned_operand", "ARA_TEST_MASK_VRF_RETURN", "data_bits", "x" * 64)):
         changed = copy.deepcopy(rows)
         target = next(r for r in changed if r["event"] == event)
         if target[key] == value:
@@ -690,7 +690,7 @@ def negative_controls(rows, nf, family):
         target[key] = value
         rejected[name] = review(changed, nf, family)["assessment"] != "PASS"
     changed = copy.deepcopy(rows)
-    emissions = [r for r in changed if r["event"] == "V01_MASK_UNIT_EMIT"]
+    emissions = [r for r in changed if r["event"] == "ARA_TEST_MASK_UNIT_EMIT"]
     if len(emissions) < 2:
         raise ValueError("Owner mutation requires two actual emitted owners")
     for key in META:

@@ -1,12 +1,13 @@
 # Mask payload alignment: reproduction status
 
-Updated on 2026-11-07. The twenty-input comparison, eight official regressions, and seven combination-J calls completed on current official main.
+Updated on 2026-11-08. The public identifiers and case directory were renamed.
+All four RTL ELFs and four separate Spike ELFs were rebuilt. The symbols and executed completion paths were checked again.
+Twenty new matrix calls and seven new combination-J calls use the rebuilt inputs.
 David Harris's complete proposal and the local two-file combination pass all four inputs.
-The original and one-file variants retain the specific failures below.
-The previous four separate Spike results and frozen-input generic module checks remain valid.
-The RTL ELFs remain identical to their retained 2026-11-01 bytes.
+The unchanged eight official regressions and ten generic module checks are reused from their earlier accepted runs.
+The old input hashes, wrong-fence rejection, deadline-snapshot failures, and earlier raw results remain in the previous public commit.
 
-Base: Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, official `config=2_lanes`, VLEN=2048, ELEN=64. The code diffs preserve the original source copyright and SHL-0.51 headers. The prior public method is David Harris's proposal linked in #529 at `868f8a21f51f82e8955665fa325526e6a002c182`. The MaskM start subset originally adopted downstream came from #468/#462. These are distinct historical statements.
+Base: Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, official `config=2_lanes`, VLEN=2048, ELEN=64. The code diffs preserve the original source copyright and SHL-0.51 headers. The prior public method is David Harris's proposal linked in #529 at `868f8a21f51f82e8955665fa325526e6a002c182`. The MaskM start subset originally adopted in the integration came from #468/#462. These are distinct historical statements.
 
 ## Five variants
 
@@ -18,9 +19,9 @@ Base: Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`, official `config=2_lanes`,
 | Combined | `lane_mask_words.patch`, then `masku_payload.patch` |
 | David | The complete author patch at `868f8a21f51f82e8955665fa325526e6a002c182`, including both files |
 
-The two changes touch different files. Each passed a forward/reverse static application check. Their combination passed a forward/reverse static application check. Do not add the index EEW change, rejected scale change, slide changes, or private integration declaration move to this comparison.
+The two changes touch different files. Each passed a forward/reverse static application check. Their combination passed a forward/reverse static application check. Do not add the index EEW change, rejected scale change, slide changes, or unrelated declaration move to this comparison.
 
-The downstream MASKU hunk did not apply directly. Its context used a different slide condition. The draft copies only the final accepted masked-memory block. It retains official main's `VSLIDEUP && !use_scalar_op` condition. The added block matches the final downstream functional block. The preparation record retains the failed context check separately from the corrected draft.
+The original local MASKU hunk did not apply directly. Its context used a different slide condition. The draft copies only the final accepted masked-memory block. It retains official main's `VSLIDEUP && !use_scalar_op` condition. The added block preserves the accepted local masked-memory logic. The preparation record retains the failed context check separately from the corrected draft.
 
 ## Difference from the existing public proposal
 
@@ -31,7 +32,7 @@ The downstream MASKU hunk did not apply directly. Its context used a different s
 | MASKU issue/processing | Reduce both counts | Leave these counts unchanged |
 | MASKU read/pointer | Update in the issue initialization | Override after the existing initializations, only for masked memory and nonzero internal start |
 | MASKU commit | Reduce the initial count | Same intended remaining interval, placed in the final masked-memory block |
-| Private declaration issue | Not part of this comparison | Excluded because the target lacks the downstream integration use |
+| Integration declaration difference | Not part of this comparison | Excluded because the target lacks the other integration use |
 
 The code is not byte-identical. A successful local run does not establish that the test exercised the existing author's full patch. Do not claim the root cause or common method as unique local work.
 
@@ -41,10 +42,10 @@ Place `mask_segments/main.c` in a separate app directory for each definition set
 
 | App | Definitions |
 | --- | --- |
-| `mask_nf5_load` | `-DV01_FAMILY=1 -DV01_NF5_E64_VL3=1` |
-| `mask_nf5_store` | `-DV01_FAMILY=2 -DV01_NF5_E64_VL3=1` |
-| `mask_nf2_load` | `-DV01_FAMILY=1 -DV01_NF2_E8_VL129=1` |
-| `mask_nf2_store` | `-DV01_FAMILY=2 -DV01_NF2_E8_VL129=1` |
+| `mask_nf5_load` | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF5_E64_VL3=1` |
+| `mask_nf5_store` | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF5_E64_VL3=1` |
+| `mask_nf2_load` | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF2_E8_VL129=1` |
+| `mask_nf2_store` | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF2_E8_VL129=1` |
 
 NF5 uses e64/m1, VL3, and five fields. Its complete mask bytes are A6. NF2 uses e8/m1, VL129, and two fields. Its mask bytes 0–15 are A6, bytes 16–31 are 59, and the remainder are C9. Thus bit128 is one while bit0 is zero.
 
@@ -74,7 +75,7 @@ For each field and element, derive its byte address from the architectural segme
 
 The C checks the complete NF5 output of 1280 bytes or NF2 output of 512 bytes. It also checks all 512 memory bytes, full mask readback, input images, CSR values, and all guards. The Python checker compares every exported signature word, including all phase records, successful counters, CSR values, guards, and footer. It does not replace the C checks of inputs that the signature does not export.
 
-After a real run, extract the bytes of `v01_memory_gap_signature` using its actual ELF symbol and size. Use raw little-endian bytes or hexadecimal u32 words without addresses. For Spike, request signature granularity 4. Do not treat an absent signature or a partial record as zero-filled success.
+After a real run, extract the bytes of `ara_test_memory_gap_signature` using its actual ELF symbol and size. Use raw little-endian bytes or hexadecimal u32 words without addresses. For Spike, request signature granularity 4. Do not treat an absent signature or a partial record as zero-filled success.
 
 ```bash
 python3 check_mask_signature.py --nf 5 --family 1 --signature actual.sig --negative-controls
@@ -119,21 +120,19 @@ They do not satisfy the full request/event criteria.
 Eight official regressions pass: O and ML each run `vcpop`, `vfirst`, `vslideup`, and `vslidedown`.
 Combination J adds the accepted decode and index-EEW changes to ML.
 Its seven calls pass: `idx64_vl3`, `idx_nf2`, `segment_rs2`, and all four masked-memory inputs.
-The three index/decode checks use their exact earlier ELFs and complete independent signatures.
+The three index/decode checks use their rebuilt public ELFs and complete independent signatures.
 The four mask checks use the same signatures and event criteria as ML/A.
 These seven checks establish only the stated composition, rather than the complete upstream PRs.
 
-This continuation makes 43 RTL calls: twenty matrix calls, eight deadline-diagnostic reruns, eight regressions, and seven J calls.
-There are 23 complete ordinary passes: eight ML/A calls, eight regressions, and seven J calls.
-The other matrix outcomes remain distinct diagnostics, protocol failures, or assertion failures.
-No new Spike or synthesis call is counted in this continuation.
-The [machine-readable results](results.json) retain exact hashes, elapsed times, checks, and failure categories.
+This update has twenty matrix calls and seven combination-J calls. Fifteen are complete ordinary passes: eight A/ML calls and all seven J calls. Two M NF5 calls pass data but fail request criteria. Eight O/L calls have protocol errors and a retained HDL cutoff. Two M NF2 calls stop at real assertions. The eight unchanged official regressions are reused separately and are not counted as new calls.
+Four new separate Spike calls match all complete signatures. No new synthesis call is counted.
+The [machine-readable results](results.json) separate new runs, reused regressions, generic checks, and previous-public failure records. It includes actual hashes, elapsed times, complete exports, checks, and failure categories.
 
 ### Retained setup failures and deadline correction
 
 The historical first ML/NF5-load attempt selected intermediate fence `0x800008b6`.
 It reported 2004 late protected byte writes and remains rejected.
-The new accepted invocation uses `0x800002ee`, after all footer stores in that exact ELF.
+The prior accepted invocation used `0x800002ee`. The rebuilt NF5-load ELF was independently checked and uses the same numeric PC after all footer stores; its bytes and SHA differ.
 
 The first eight O/L calls exposed a separate run-control issue.
 `run 20 ms; quit` stopped before the observer's scheduled deadline snapshot.
@@ -144,7 +143,7 @@ Only those eight diagnostics reran in new output directories.
 Each new log has two lane snapshots and one unit snapshot at exactly 20 ms.
 Their fields match the actual final summaries.
 The DUT, observer, ELF, checker, and time limits remain identical.
-The accepted completed ML/A calls retain their original commands and evidence.
+Those earlier calls remain in the previous public commit. Every call in this update uses `run 20 ms`, `run 0 ns`, and `quit`, including the completed A/ML/J calls.
 
 ### Reused implementation and model evidence
 
@@ -155,9 +154,7 @@ Each has zero latches and no unexplained post-compile module, loop, or multiple-
 The retained pre-compile native-operator black-box attributes and other warnings remain documented in the original structural review.
 This is generic `compile -no_map` evidence. It does not establish technology mapping, timing closure, or physical signoff.
 
-The four unchanged separate Spike ELFs retain their previously accepted complete gold results.
-They use their own runtime and differ from the common RTL ELFs.
-Their results do not replace official RTL execution.
+Four new separate Spike ELFs pass all 1502/1502/926/926 signature words against the independent oracle. They use their own runtime and differ from the common RTL ELFs. Their results do not replace official RTL execution. Their source and ELF hashes are recorded separately in results.json.
 
 ## Actual final-fence bindings
 
@@ -165,25 +162,34 @@ The following PCs follow the complete signature footer stores and precede the fi
 
 | RTL ELF | SHA256 | Final fence PC | Signature u32 words |
 | --- | --- | --- | ---: |
-| `mask_nf5_load` | `985051a75d940a860d5507919cc7f0ff4cddae6a033b9c0893d9c288460f022d` | `0x800002ee` | 1502 |
-| `mask_nf5_store` | `991f4e2e87602381aa95a4f29595e7208d2737676d21e48f5a33a799c480aaaf` | `0x800002ec` | 1502 |
-| `mask_nf2_load` | `26990a560f763cfeedb21230052b300e98e6004f4e23670933b9a051c2298211` | `0x80001898` | 926 |
-| `mask_nf2_store` | `8b2220dd03773e0127fb61cd6e5a289c4623c863b2ab29dfddbed9738955dee7` | `0x80001954` | 926 |
+| `mask_nf5_load` | `80fc6e98f21eea7b8c207f6312d906e795f4ab2c03f3e8a07b2ce635d1e3f052` | `0x800002ee` | 1502 |
+| `mask_nf5_store` | `49ea32e980ad459a1e7ee5adaab3160459e81ae9e3900acd4693365289d70af0` | `0x800002ec` | 1502 |
+| `mask_nf2_load` | `f6b51c01275096c9fa1ba860457f1b3e39b8bfc6b1f4583cd4666aa51a808af2` | `0x80001898` | 926 |
+| `mask_nf2_store` | `5514fb476399c44c10cedb74d8535750ddd12f22fced1ee776a8c3553b7612a6` | `0x80001954` | 926 |
+
+The same ELF symbols select these two complete export regions:
+
+| App | Signature base / u32 words | Phase base / u32 words |
+| --- | --- | --- |
+| `mask_nf5_load` | `80002740` / 1502 | `80003eb8` / 1 |
+| `mask_nf5_store` | `80002a00` / 1502 | `80004178` / 1 |
+| `mask_nf2_load` | `80002700` / 926 | `80003578` / 1 |
+| `mask_nf2_store` | `800027c0` / 926 | `80003638` / 1 |
 
 These bindings apply only to the listed ELF bytes. A new software build requires a new symbol, footer, and fence check. Acceptance requires the correct unique final fence, zero late writes, complete gold, actual owner checks, normal exit, and assertion review.
 
-## Public source and compiled-source distinction
+## Current public and compiled inputs
 
-The recorded ELF builds used C source SHA256 `759bec16ca09d00113154da24b6ff19525f810ff25aaf3996427911811f78d9b`. The current public C has SHA256 `be98bfc99a0fb316ccd8e8ead1d62fbb94aa78d5dabcc19e0148e04a75a9897d`.
+The current public C was compiled again, including the neutral identifiers. Each source SHA matches the actual software-build receipt. The new RTL and Spike ELF hashes, exact run arguments, passive-observer hashes, checker results, and exported data are in results.json. The previous public commit retains the earlier compiled/public-source distinction and old ELF hashes. No old run is relabelled as a test of the new input.
 
-The public copy contains clang-format 20.1.0 changes and a neutral header comment. Standard C line splicing and adjacent-string concatenation produce the same complete 3759 tokens and literal contents. All 127 logical preprocessor directives also match. The official formatting checker accepted the final public file. These format and comment edits caused no new software build or RTL run. The compiled source and original ELF bytes remain retained.
+The DC source code, packages, and wrapper types are unchanged. The public environment-variable labels were renamed without changing the script logic. The ten earlier accepted generic checks are reused evidence; this update contains no new DC invocation.
 
 ## Commands and acceptance scope
 
 [COMMANDS.md](../COMMANDS.md) provides the official app, Bender/VCS, run, and checking entries.
 Use separate sources and writable outputs for each variant.
 The official source, dependencies, executable, and ELF remain frozen during each call.
-The actual calls used at most eight concurrent independent runs.
+Independent frozen inputs used separate writable build and run directories.
 
 The unchanged time-zero `axi_inval_filter` unique-case warning remains in the accepted logs.
 All accepted candidates pass native completion, full data/guard checks, final-fence export, actual owner checks, and unexpected-assertion review.

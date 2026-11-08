@@ -6,15 +6,15 @@ The recorded tools were LLVM 20.1.0, Spike revision prefix `5cf439b2`, and VCS W
 
 ## Software
 
-Copy [main.c](batch7/mask_segments/main.c) to four separate official app directories.
+Copy [main.c](cases/mask_segments/main.c) to four separate official app directories.
 Use these definitions. Separate app names prevent reuse of objects with different compiler flags.
 
 | App | Definitions |
 | --- | --- |
-| mask_nf5_load | `-DV01_FAMILY=1 -DV01_NF5_E64_VL3=1` |
-| mask_nf5_store | `-DV01_FAMILY=2 -DV01_NF5_E64_VL3=1` |
-| mask_nf2_load | `-DV01_FAMILY=1 -DV01_NF2_E8_VL129=1` |
-| mask_nf2_store | `-DV01_FAMILY=2 -DV01_NF2_E8_VL129=1` |
+| mask_nf5_load | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF5_E64_VL3=1` |
+| mask_nf5_store | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF5_E64_VL3=1` |
+| mask_nf2_load | `-DARA_TEST_FAMILY=1 -DARA_TEST_NF2_E8_VL129=1` |
+| mask_nf2_store | `-DARA_TEST_FAMILY=2 -DARA_TEST_NF2_E8_VL129=1` |
 
 Example for one app:
 
@@ -22,19 +22,16 @@ Example for one app:
 make -C "$ARA_ROOT/apps" config=2_lanes "LLVM_INSTALL_DIR=$LLVM_ROOT" \
   "LLVM_FLAGS=--target=riscv64-unknown-elf --sysroot=$LLVM_ROOT/riscv64-unknown-elf -isystem $LLVM_ROOT/riscv64-unknown-elf/include -march=rv64gcv_zfh_zvfh -mabi=lp64d -mno-relax -fuse-ld=lld --rtlib=compiler-rt -L$LLVM_ROOT/riscv64-unknown-elf/lib" \
   "LLVM_V_FLAGS=-fno-vectorize -fno-slp-vectorize -mno-implicit-float" \
-  RISCV_STRIP=true ENV_DEFINES='-DV01_FAMILY=1 -DV01_NF5_E64_VL3=1' bin/mask_nf5_load
+  RISCV_STRIP=true ENV_DEFINES='-DARA_TEST_FAMILY=1 -DARA_TEST_NF5_E64_VL3=1' bin/mask_nf5_load
 ```
 
 Build each RTL ELF once. Keep the same ELF across compared source variants.
-The published C differs from the retained compiled C in formatting and comments.
-Their complete canonical tokens, literal contents, and logical preprocessor directives match.
-A new build still requires its own symbol and final-fence binding.
-The recorded SHA/PC table in the reproduction report applies only to its exact retained ELF bytes.
+The current public C was compiled again for this update. The source, RTL ELF, and separate Spike ELF hashes are recorded in cases/results.json. The symbol and completion-path checks were repeated on each new RTL ELF. The SHA/PC table applies only to those exact bytes.
 
 ## RTL variants and build
 
-O is unchanged official main. M applies [masku_payload.patch](batch7/masku_payload.patch).
-L applies [lane_mask_words.patch](batch7/lane_mask_words.patch). ML applies both.
+O is unchanged official main. M applies [masku_payload.patch](cases/masku_payload.patch).
+L applies [lane_mask_words.patch](cases/lane_mask_words.patch). ML applies both.
 A applies David Harris's complete [fixed proposal](https://github.com/davidharrishmc/ara-repros/blob/868f8a21f51f82e8955665fa325526e6a002c182/masked-vstart-mask-entries/fix.patch).
 Use separate source and build directories. Do not add the index-scale or slide changes.
 
@@ -75,25 +72,24 @@ quit
 `run 0 ns` processes events at the same deadline timestamp. It does not advance simulation time.
 Without it, UCLI can quit before that timestamp's passive snapshot executes.
 This behavior was reproduced in a separate minimal VCS test.
-The eight original incomplete O/L calls are retained. Only those diagnostics required new invocations.
-Already completed A/ML calls retain their original `run 20 ms; quit` input.
+Every new matrix and combination call used this complete UCLI file. The earlier endpoint failures and corrected diagnostic reruns remain in the previous public commit. They are separate from this rebuilt-input comparison.
 
 ```bash
 mkdir "$RUN_DIR"
 cd "$RUN_DIR"
 timeout 600 "$BUILD_DIR/simv" -no_save -ucli -do "$LIMIT_TCL" \
-  "+PRELOAD=$ARA_ROOT/apps/bin/$APP" +V01_OBSERVER \
-  "+V01_FENCE_PC=$FENCE_PC" +V01_REGIONS=2 \
-  +V01_MASK_START_OBSERVE +V01_MASK_SNAPSHOT_NS=20000000 \
-  "+V01_R0_BASE=$SIGNATURE_BASE" "+V01_R0_WORDS=$SIGNATURE_WORDS" \
-  +V01_R0_NAME=v01_memory_gap_signature \
-  "+V01_R1_BASE=$PHASE_BASE" +V01_R1_WORDS=1 +V01_R1_NAME=v01_memory_gap_phase \
+  "+PRELOAD=$ARA_ROOT/apps/bin/$APP" +ARA_TEST_OBSERVER \
+  "+ARA_TEST_FENCE_PC=$FENCE_PC" +ARA_TEST_REGIONS=2 \
+  +ARA_TEST_MASK_START_OBSERVE +ARA_TEST_MASK_SNAPSHOT_NS=20000000 \
+  "+ARA_TEST_R0_BASE=$SIGNATURE_BASE" "+ARA_TEST_R0_WORDS=$SIGNATURE_WORDS" \
+  +ARA_TEST_R0_NAME=ara_test_memory_gap_signature \
+  "+ARA_TEST_R1_BASE=$PHASE_BASE" +ARA_TEST_R1_WORDS=1 +ARA_TEST_R1_NAME=ara_test_memory_gap_phase \
   > run.log 2>&1
 python3 "$PUBLIC_ROOT/common/review_ara_observer.py" \
-  --elf "$ARA_ROOT/apps/bin/$APP" --log v01_observer.log --expect-target 0
-python3 "$PUBLIC_ROOT/batch7/check_mask_signature.py" \
-  --nf "$NF" --family "$FAMILY" --signature v01_region_0.hex --negative-controls
-python3 "$PUBLIC_ROOT/batch7/check_mask_events.py" \
+  --elf "$ARA_ROOT/apps/bin/$APP" --log ara_test_observer.log --expect-target 0
+python3 "$PUBLIC_ROOT/cases/check_mask_signature.py" \
+  --nf "$NF" --family "$FAMILY" --signature ara_test_region_0.hex --negative-controls
+python3 "$PUBLIC_ROOT/cases/check_mask_events.py" \
   --nf "$NF" --family "$FAMILY" --log run.log \
   --ara-pkg "$ARA_ROOT/hardware/include/ara_pkg.sv" --variant "$VARIANT" --negative-controls
 ```
@@ -108,5 +104,20 @@ Its completed NF5 inputs still have incorrect physical mask-word requests.
 
 Independent invocations may run concurrently after inputs are frozen. Writable outputs must remain separate.
 No shared object tree is rebuilt during these runs.
-The public [B5/B6 commands](https://github.com/lionelZhaowy/ara/blob/c70bbe98e38434736378407b3f30da331e7ec4cf/verification/index-eew/COMMANDS.md) record the previously accepted index/decode inputs and module checks.
-The combination J checks use those exact ELFs with decode, index EEW, and the two local mask patches.
+Combination J applies the independent index-EEW and segment-decode patches before the two local mask patches. Its seven actual calls use the rebuilt index, segment, and mask ELFs recorded in results.json. The independent index/decode input definitions and complete signatures remain documented in their corresponding public material directories.
+
+## Separate Spike runtime
+
+Apply [spike_sections.patch](common/spike_sections.patch) in a separate software checkout for LLVM suffixed sections. Build the same four sources and definition sets with their `.spike` targets. This runtime prepares its own startup source; do not build RTL software in that checkout at the same time. Each model call has a 60-second wall limit:
+
+```bash
+timeout 60 "$SPIKE_ROOT/bin/spike" --isa=rv64gcv --varch=vlen:2048,elen:64 \
+  --priv=msu --pmpregions=0 +signature=signature.hex +signature-granularity=4 \
+  "$ARA_ROOT/apps/bin/mask_nf5_load.spike"
+```
+
+Select each app's actual name, NF, and family for its complete signature check. All four separate model signatures passed the independent checker. These model results do not establish RTL behavior.
+
+## Reused generic implementation checks
+
+The production RTL, packages, and wrapper types are unchanged. The public DC environment-variable labels were renamed without changing the script logic. The earlier accepted ten generic module checks remain recorded as reused evidence. This update contains no new DC invocation.
