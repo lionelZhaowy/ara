@@ -15,14 +15,14 @@
 #define STR(x) STR_I(x)
 #define ELEMENTS 64
 #define CASES 16
-#ifndef V01_FIRST
-#define V01_FIRST 12
+#ifndef ARA_TEST_FIRST
+#define ARA_TEST_FIRST 12
 #endif
-#ifndef V01_COUNT
-#define V01_COUNT 1
+#ifndef ARA_TEST_COUNT
+#define ARA_TEST_COUNT 1
 #endif
-#ifndef V01_TEST_VL
-#define V01_TEST_VL 3
+#ifndef ARA_TEST_TEST_VL
+#define ARA_TEST_TEST_VL 3
 #endif
 #define CASE_WORDS 148
 #define SIGNATURE_WORDS (8 + CASES * CASE_WORDS)
@@ -37,20 +37,20 @@
  * started, 1 started, 2 checked successfully, 3 checked with errors.
  */
 __asm__(
-    ".pushsection .data.v01_ordered_signature,\"aw\",@progbits\n"
+    ".pushsection .data.ara_test_ordered_signature,\"aw\",@progbits\n"
     ".balign 64\n"
 #ifdef SPIKE
     ".global begin_signature\nbegin_signature:\n"
 #endif
-    ".global v01_ordered_signature\n.type v01_ordered_signature,@object\n"
-    "v01_ordered_signature:\n.zero " STR(
+    ".global ara_test_ordered_signature\n.type ara_test_ordered_signature,@object\n"
+    "ara_test_ordered_signature:\n.zero " STR(
         SIGNATURE_BYTES) "\n"
-                         ".size v01_ordered_signature,.-v01_ordered_signature\n"
+                         ".size ara_test_ordered_signature,.-ara_test_ordered_signature\n"
 #ifdef SPIKE
                          ".global end_signature\nend_signature:\n"
 #endif
                          ".popsection\n");
-extern volatile uint32_t v01_ordered_signature[SIGNATURE_WORDS];
+extern volatile uint32_t ara_test_ordered_signature[SIGNATURE_WORDS];
 
 struct words {
   uint32_t before, data[ELEMENTS], after;
@@ -74,7 +74,7 @@ static struct fixture storage __attribute__((aligned(64)));
 static unsigned checks, failures, completed;
 /* First error is inspectable on both platforms, including when UART is absent.
  */
-volatile uint64_t v01_ordered_first_error[5];
+volatile uint64_t ara_test_ordered_first_error[5];
 struct result {
   uintptr_t returned, vl, vtype, vstart, first, index_max;
 };
@@ -84,13 +84,13 @@ static void check(unsigned id, unsigned field, unsigned i, uint64_t actual,
   ++checks;
   if (actual != expected) {
     if (!failures) {
-      v01_ordered_first_error[0] = id;
-      v01_ordered_first_error[1] = field;
-      v01_ordered_first_error[2] = i;
-      v01_ordered_first_error[3] = actual;
-      v01_ordered_first_error[4] = expected;
+      ara_test_ordered_first_error[0] = id;
+      ara_test_ordered_first_error[1] = field;
+      ara_test_ordered_first_error[2] = i;
+      ara_test_ordered_first_error[3] = actual;
+      ara_test_ordered_first_error[4] = expected;
 #ifndef SPIKE
-      printf("V01_ORDERED_FIRST_FAIL id=%u field=%u i=%u got=%08x:%08x "
+      printf("ARA_TEST_ORDERED_FIRST_FAIL id=%u field=%u i=%u got=%08x:%08x "
              "want=%08x:%08x\n",
              id, field, i, (unsigned)(actual >> 32), (unsigned)actual,
              (unsigned)(expected >> 32), (unsigned)expected);
@@ -169,7 +169,7 @@ static uint8_t index_byte(unsigned id, unsigned is_store, unsigned eew,
         [imax] "=&r"(r.index_max)                                              \
       : [index] "r"(p->index.data), [old] "r"(p->old.data),                    \
         [mask] "r"(p->mask.data), [memory] "r"(p->memory.data),                \
-        [out] "r"(p->out.data), [avl] "r"((uintptr_t)V01_TEST_VL)              \
+        [out] "r"(p->out.data), [avl] "r"((uintptr_t)ARA_TEST_TEST_VL)              \
       : "t0", "v0", "v4", "v5", "v8", "memory")
 #define WIDTH_CASES(BASE, W, M)                                                \
   case BASE:                                                                   \
@@ -196,8 +196,8 @@ static struct result execute(unsigned id, volatile struct fixture *p) {
   return r;
 }
 static void put64(unsigned position, uint64_t value) {
-  v01_ordered_signature[position] = (uint32_t)value;
-  v01_ordered_signature[position + 1] = (uint32_t)(value >> 32);
+  ara_test_ordered_signature[position] = (uint32_t)value;
+  ara_test_ordered_signature[position + 1] = (uint32_t)(value >> 32);
 }
 static void run(unsigned id) {
   const unsigned eew = 8U << (id / 4);
@@ -207,11 +207,11 @@ static void run(unsigned id) {
   const unsigned previous = failures;
   volatile struct fixture *p = (&storage);
   volatile struct words *word_buffers[] = {&p->old, &p->memory, &p->out};
-  v01_ordered_signature[base] = id;
-  v01_ordered_signature[base + 1] = is_store;
-  v01_ordered_signature[base + 2] = eew;
-  v01_ordered_signature[base + 3] = masked;
-  v01_ordered_signature[base + 4] = 1;
+  ara_test_ordered_signature[base] = id;
+  ara_test_ordered_signature[base + 1] = is_store;
+  ara_test_ordered_signature[base + 2] = eew;
+  ara_test_ordered_signature[base + 3] = masked;
+  ara_test_ordered_signature[base + 4] = 1;
   for (unsigned i = 0; i < ELEMENTS; ++i) {
     p->old.data[i] = old_value(id, i);
     p->memory.data[i] = memory_value(id, i);
@@ -231,26 +231,26 @@ static void run(unsigned id) {
     p->mask.data[i] = masked ? UINT8_C(0xaa) : UINT8_C(0xff);
 
   const struct result r = execute(id, p);
-  check(id, 0, 0, r.returned, V01_TEST_VL);
-  check(id, 1, 0, r.vl, V01_TEST_VL);
+  check(id, 0, 0, r.returned, ARA_TEST_TEST_VL);
+  check(id, 1, 0, r.vl, ARA_TEST_TEST_VL);
   check(id, 2, 0, r.vtype, 16); /* SEW32/m1, tu/mu, vill=0. */
   check(id, 3, 0, r.vstart, 0);
   check(id, 4, 0, r.index_max, ELEMENTS);
   for (unsigned i = 0; i < ELEMENTS; ++i) {
-    const unsigned active = i < V01_TEST_VL && (!masked || (i & 1));
+    const unsigned active = i < ARA_TEST_TEST_VL && (!masked || (i & 1));
     const uint32_t want_register = !is_store && active
                                        ? memory_value(id, offset(0, i) / 4)
                                        : old_value(id, i);
     const uint32_t want_memory = is_store && i == 2
                                      ? old_value(id, masked ? 1 : 2)
                                      : memory_value(id, i);
-    check(id, i < V01_TEST_VL ? 5 : 6, i, p->out.data[i], want_register);
+    check(id, i < ARA_TEST_TEST_VL ? 5 : 6, i, p->out.data[i], want_register);
     check(id, 7, i, p->memory.data[i], want_memory);
     check(id, 8, i, p->old.data[i], old_value(id, i));
     if (i == 0)
       check(id, 9, 0, (uint32_t)r.first, want_register);
-    v01_ordered_signature[base + 16 + i] = p->out.data[i];
-    v01_ordered_signature[base + 80 + i] = p->memory.data[i];
+    ara_test_ordered_signature[base + 16 + i] = p->out.data[i];
+    ara_test_ordered_signature[base + 80 + i] = p->memory.data[i];
   }
   for (unsigned b = 0; b < 3; ++b) {
     check(id, 10, b, word_buffers[b]->before, guard(id, b, 0));
@@ -268,14 +268,14 @@ static void run(unsigned id) {
   put64(base + 7, r.vl);
   put64(base + 9, r.vtype);
   put64(base + 11, r.vstart);
-  v01_ordered_signature[base + 13] = failures - previous;
-  v01_ordered_signature[base + 14] = (uint32_t)r.index_max;
-  v01_ordered_signature[base + 15] = masked ? (V01_TEST_VL / 2) : V01_TEST_VL;
-  v01_ordered_signature[base + 144] = p->memory.before;
-  v01_ordered_signature[base + 145] = p->memory.after;
-  v01_ordered_signature[base + 146] = p->out.before;
-  v01_ordered_signature[base + 147] = p->out.after;
-  v01_ordered_signature[base + 4] = failures == previous ? 2 : 3;
+  ara_test_ordered_signature[base + 13] = failures - previous;
+  ara_test_ordered_signature[base + 14] = (uint32_t)r.index_max;
+  ara_test_ordered_signature[base + 15] = masked ? (ARA_TEST_TEST_VL / 2) : ARA_TEST_TEST_VL;
+  ara_test_ordered_signature[base + 144] = p->memory.before;
+  ara_test_ordered_signature[base + 145] = p->memory.after;
+  ara_test_ordered_signature[base + 146] = p->out.before;
+  ara_test_ordered_signature[base + 147] = p->out.after;
+  ara_test_ordered_signature[base + 4] = failures == previous ? 2 : 3;
   ++completed;
 }
 
@@ -284,24 +284,24 @@ int main(void) {
   __asm__ volatile("csrw vstart, zero" ::: "memory");
   __asm__ volatile("csrr %0, vlenb" : "=r"(vlenb));
   for (unsigned i = 0; i < SIGNATURE_WORDS; ++i)
-    v01_ordered_signature[i] = 0;
-  v01_ordered_signature[0] = UINT32_C(0x56314f49);
-  v01_ordered_signature[1] = 1;
-  v01_ordered_signature[2] = CASES;
-  v01_ordered_signature[3] = 32;
-  v01_ordered_signature[4] = V01_TEST_VL;
-  v01_ordered_signature[5] = (uint32_t)vlenb;
+    ara_test_ordered_signature[i] = 0;
+  ara_test_ordered_signature[0] = UINT32_C(0x56314f49);
+  ara_test_ordered_signature[1] = 1;
+  ara_test_ordered_signature[2] = CASES;
+  ara_test_ordered_signature[3] = 32;
+  ara_test_ordered_signature[4] = ARA_TEST_TEST_VL;
+  ara_test_ordered_signature[5] = (uint32_t)vlenb;
   check(CASES, 18, 0, vlenb, 256);
   check(CASES, 19, 0, ((uintptr_t)&storage % 64) == 0, 1);
   if (!failures)
-    for (unsigned id = V01_FIRST; id < V01_FIRST + V01_COUNT; ++id)
+    for (unsigned id = ARA_TEST_FIRST; id < ARA_TEST_FIRST + ARA_TEST_COUNT; ++id)
       run(id);
-  check(CASES, 20, 0, completed, V01_COUNT);
-  v01_ordered_signature[6] = checks;
-  v01_ordered_signature[7] = failures;
+  check(CASES, 20, 0, completed, ARA_TEST_COUNT);
+  ara_test_ordered_signature[6] = checks;
+  ara_test_ordered_signature[7] = failures;
   __asm__ volatile("fence rw, rw" : : : "memory");
 #ifndef SPIKE
-  printf("V01_ORDERED_DONE cases=%u checks=%u errors=%u\n", completed, checks,
+  printf("ARA_TEST_ORDERED_DONE cases=%u checks=%u errors=%u\n", completed, checks,
          failures);
 #endif
   return failures ? 94 : 0;

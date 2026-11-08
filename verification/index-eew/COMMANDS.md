@@ -2,7 +2,7 @@
 
 ## Fixed source and tools
 
-Use separate source copies at Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`. Keep the unchanged `Bender.lock` dependencies and CVA6 HPDcache gitlink. The source variants contain only the patches stated in each batch report. Do not add an unrelated repair stack.
+Use separate source copies at Ara `34bd3bc152421b4601a7bf3d6e8e91ffb545c99e`. Keep the unchanged `Bender.lock` dependencies and CVA6 HPDcache gitlink. The source variants contain only the patches stated in the input report. Do not add an unrelated repair stack.
 
 | Locked dependency | Commit |
 | --- | --- |
@@ -21,7 +21,7 @@ Set `ARA_ROOT` to the selected source copy, `PUBLIC_ROOT` to this material direc
 
 ## Software and result checks
 
-The [actual input definitions and commands](batch5/REPRODUCTION.md#actual-commands) identify all five software builds, the fifteen RTL calls, the five model ELFs, memory regions, and independent gold. Copy each C input to its named official `apps/<name>/main.c` location. The official startup enables vector state before user-mode main. Keep the compiled-run source hashes distinct from the current public formatting copies.
+The [actual input definitions and commands](cases/REPRODUCTION.md#actual-commands) identify all five software builds, the fifteen RTL calls, the five model ELFs, memory regions, and independent gold. Copy each C input to its named official `apps/<name>/main.c` location. The official startup enables vector state before user-mode main. The current C copies were compiled again for this update; their exact source hashes and new ELF hashes are recorded together in results.json.
 
 ## RTL build
 
@@ -50,22 +50,23 @@ vcs -full64 -sverilog -timescale=1ns/1ps -assert svaext \
 
 The actual variant compile scripts reused the generated source list with only the source root changed. The extra tops are passive observers. No waveform or extra trace define was added; the official source list already contains `instr_tracer`.
 
-The real-memory observer source was unchanged across batches 5 and 6. The mask observer was compiled but not enabled in those calls. Its source was later revised for batch 7. Thus a build with the current mask observer has a new executable hash; it is not the retained batch 5/6 executable or evidence of mask-event coverage in those runs. Each batch's recorded executable and source hashes identify the version actually used.
+The renamed passive observers were compiled again for this update. The index and segment comparisons use the byte-identical observer copies bundled in their respective material directories. Mask-event logging is disabled for these calls. Combination J uses the current mask comparison's passive observers and the same real-memory export logic. Simulator and source hashes identify each actual build.
 
-## Serial runtime and limits
+## Runtime and limits
 
 Each call used its own output directory, a 600-second wall limit, and this UCLI file:
 
 ```text
 run 20 ms
+run 0 ns
 quit
 ```
 
-The real top reads `+PRELOAD=<ELF>`. It does not read TIMEOUT or MAX_CYCLES plusargs. The [input-specific arguments](batch5/REPRODUCTION.md#actual-commands) enable the passive memory observer. The selected FENCE PC follows every signature store on the completion path. Obtain PCs and region boundaries from the actual ELF after a rebuild. Address order alone does not identify the final fence because LLVM can reorder basic blocks.
+The real top reads `+PRELOAD=<ELF>`. It does not read TIMEOUT or MAX_CYCLES plusargs. The [input-specific arguments](cases/REPRODUCTION.md#actual-commands) enable the passive memory observer. The selected FENCE PC follows every signature store on the completion path. Obtain PCs and region boundaries from the actual ELF after a rebuild. Address order alone does not identify the final fence because LLVM can reorder basic blocks.
 
 The observer reads complete symbol regions from the real DRAM and records accelerator consistency, LSU/store-buffer drain, one final fence, one native exit, and absence of later result writes. The independent byte-address checker checks the exported values. Process exit zero, a fence by itself, or an AXI data value without an address is insufficient.
 
-The scale-only NF2 control returns target 96 with one wrong data word and three error/status changes. The two incomplete original runs use `--allow-incomplete`, reached the 20 ms HDL cutoff, and are not PASS results. All raw data used for the complete-value reviews can be reconstructed from `batch5/results.json`.
+The scale-only NF2 control returns target 96 with one wrong data word and three error/status changes. The two incomplete original runs use `--allow-incomplete`, reached the 20 ms HDL cutoff, and are not PASS results. All raw data used for the complete-value reviews can be reconstructed from `cases/results.json`.
 
 ## Separate Spike runtime
 
@@ -81,4 +82,6 @@ Apply [spike_sections.patch](common/spike_sections.patch) in the isolated checko
 
 The [DC instructions](common/dc/README.md) specify the exact packages, all-port wrapper, and isolated output directories. O and I completed real lane-sequencer analyze, elaborate, link, and generic `compile -no_map`. No S DC call was planned or executed. This is a generic structural check, not timing or physical signoff.
 
-The bundled mask observer is the original inactive version, SHA256 `0fdc3df529202cc431170a106a72d2e9460d3fa926f4d483136ebe200459416d`. It was compiled but supplied no mask-event evidence for these calls. The active real-memory observer retained its recorded source.
+The bundled mask observer was compiled again after the public identifier changes. It was disabled during the index and segment calls and supplies no mask-event coverage for them.
+
+The DC script logic, production sources, packages, and wrapper types are unchanged. The environment-variable labels in the public copies were renamed. The recorded DC results are the earlier accepted generic checks, not new DC invocations.

@@ -1,6 +1,6 @@
 # Index operand width: official Ara comparison
 
-Status: three RTL variants, fifteen SoC calls, and five separate Spike runs completed. The O/I real-lane Design Compiler checks were accepted for the fixed generic structural scope below. S is a simulation control and had no planned or executed DC run. Publication is pending.
+Status: the public identifiers and case directory were renamed. All five RTL ELFs were rebuilt, rebound to their symbols and completion fences, and compared in fifteen new SoC calls. Five separate Spike ELFs were rebuilt and checked. Two new combination-J calls also pass. The unchanged O/I production RTL retains its previously accepted generic lane checks; no new DC run is claimed. S remains a simulation control without a DC result.
 
 ## Fixed source and configuration
 
@@ -20,9 +20,9 @@ All inputs use data e32/m1, `tu,mu`, no mask, and architectural `vstart=0`. Each
 
 | App / source | Compile definitions | O | S | I |
 | --- | --- | --- | --- | --- |
-| `idx64_vl2` / [index_nf1/main.c](index_nf1/main.c) | `V01_FIRST=12 V01_COUNT=1 V01_TEST_VL=2` | PASS | PASS | PASS |
-| `idx64_vl3` / same | `V01_FIRST=12 V01_COUNT=1 V01_TEST_VL=3` | No completion by 20 ms HDL limit | PASS | PASS |
-| `idx64_store` / same | `V01_FIRST=14 V01_COUNT=1 V01_TEST_VL=3` | No completion by 20 ms HDL limit | PASS | PASS |
+| `idx64_vl2` / [index_nf1/main.c](index_nf1/main.c) | `ARA_TEST_FIRST=12 ARA_TEST_COUNT=1 ARA_TEST_TEST_VL=2` | PASS | PASS | PASS |
+| `idx64_vl3` / same | `ARA_TEST_FIRST=12 ARA_TEST_COUNT=1 ARA_TEST_TEST_VL=3` | No completion by 20 ms HDL limit | PASS | PASS |
+| `idx64_store` / same | `ARA_TEST_FIRST=14 ARA_TEST_COUNT=1 ARA_TEST_TEST_VL=3` | No completion by 20 ms HDL limit | PASS | PASS |
 | `idx_nf2` / [index_nf2/main.c](index_nf2/main.c) | Defaults: NF2, case12, count1, VL3 | PASS | One data error; target 96 | PASS |
 | `idx8_pair` / [index8_pair/main.c](index8_pair/main.c) | None; two consecutive ordered index8 loads, VL5 | PASS | PASS | PASS |
 
@@ -33,14 +33,14 @@ Each NF1 run that completed reports one case, 731 checks, and zero errors. NF2 r
 The complete S diagnostic is:
 
 ```text
-V01_ORDERED_SEG_FIRST_FAIL id=12 field=5 i=66 got=00000000:5732182f want=00000000:56301c10
-V01_ORDERED_SEG_DONE nf=2 cases=1 checks=827 errors=1
+ARA_TEST_ORDERED_SEG_FIRST_FAIL id=12 field=5 i=66 got=00000000:5732182f want=00000000:56301c10
+ARA_TEST_ORDERED_SEG_DONE nf=2 cases=1 checks=827 errors=1
 Core Test *** FAILED *** (tohost = 96)
 ```
 
 `field=5` is the active-destination comparison category. It is not segment field 5. The flattened destination index 66 is field 1, element 2. There is one incorrect data word, at full-signature index 2254. Three additional signature words correctly report the error count and failed-case state; they are not three additional data errors.
 
-The two original VL3 runs reached `20000000000 ps` (20 ms) and the UCLI `quit` command without a software summary, selected final fence, native exit, or normal testbench `$finish`. Wall times were 253.527 and 252.335 seconds, and `wall_timeout` was false. The exported record state remained started. These results establish no completion within the fixed HDL interval, not a permanent deadlock or a 600-second wall timeout.
+The two original VL3 runs reached `20000000000 ps` (20 ms) and the UCLI `quit` command without a software summary, selected final fence, native exit, or normal testbench `$finish`. Wall times were 249.128 and 249.356 seconds, and `wall_timeout` was false. The exported record state remained started. These results establish no completion within the fixed HDL interval, not a permanent deadlock or a 600-second wall timeout.
 
 ## Complete data checks
 
@@ -92,9 +92,9 @@ llvm_args=(
   "LLVM_V_FLAGS=-fno-vectorize -fno-slp-vectorize -mno-implicit-float"
   RISCV_STRIP=true
 )
-make -C apps "${llvm_args[@]}" ENV_DEFINES='-DV01_FIRST=12 -DV01_COUNT=1 -DV01_TEST_VL=2' bin/idx64_vl2
-make -C apps "${llvm_args[@]}" ENV_DEFINES='-DV01_FIRST=12 -DV01_COUNT=1 -DV01_TEST_VL=3' bin/idx64_vl3
-make -C apps "${llvm_args[@]}" ENV_DEFINES='-DV01_FIRST=14 -DV01_COUNT=1 -DV01_TEST_VL=3' bin/idx64_store
+make -C apps "${llvm_args[@]}" ENV_DEFINES='-DARA_TEST_FIRST=12 -DARA_TEST_COUNT=1 -DARA_TEST_TEST_VL=2' bin/idx64_vl2
+make -C apps "${llvm_args[@]}" ENV_DEFINES='-DARA_TEST_FIRST=12 -DARA_TEST_COUNT=1 -DARA_TEST_TEST_VL=3' bin/idx64_vl3
+make -C apps "${llvm_args[@]}" ENV_DEFINES='-DARA_TEST_FIRST=14 -DARA_TEST_COUNT=1 -DARA_TEST_TEST_VL=3' bin/idx64_store
 make -C apps "${llvm_args[@]}" ENV_DEFINES= bin/idx_nf2
 make -C apps "${llvm_args[@]}" ENV_DEFINES= bin/idx8_pair
 ```
@@ -103,31 +103,31 @@ make -C apps "${llvm_args[@]}" ENV_DEFINES= bin/idx8_pair
 
 | App | Final fence PC | Region 0 symbol / base / u32 words |
 | --- | --- | --- |
-| `idx64_vl2` | `800013d6` | `v01_ordered_signature` / `80002240` / 2376 |
-| `idx64_vl3` | `80001546` | `v01_ordered_signature` / `800023c0` / 2376 |
-| `idx64_store` | `800014fc` | `v01_ordered_signature` / `80002380` / 2376 |
-| `idx_nf2` | `8000194a` | `v01_ordered_segment_signature` / `800027c0` / 2892 |
+| `idx64_vl2` | `800013d6` | `ara_test_ordered_signature` / `80002240` / 2376 |
+| `idx64_vl3` | `80001546` | `ara_test_ordered_signature` / `800023c0` / 2376 |
+| `idx64_store` | `800014fc` | `ara_test_ordered_signature` / `80002380` / 2376 |
+| `idx_nf2` | `8000194a` | `ara_test_ordered_segment_signature` / `800027c0` / 2892 |
 | `idx8_pair` | `8000053a` | Four regions listed below |
 
 Example for the NF2 input; use each of `$BUILD_O/simv`, `$BUILD_S/simv`, and `$BUILD_I/simv` with these same arguments:
 
 ```bash
-"$BUILD_I/simv" -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/idx_nf2" \
-  +V01_OBSERVER +V01_VECTOR_COMMIT +V01_FENCE_PC=8000194a +V01_REGIONS=1 \
-  +V01_R0_BASE=800027c0 +V01_R0_WORDS=2892 +V01_R0_NAME=v01_ordered_segment_signature
+timeout 600 "$BUILD_I/simv" -no_save -ucli -do "$LIMIT_TCL" "+PRELOAD=$ARA_ROOT/apps/bin/idx_nf2" \
+  +ARA_TEST_OBSERVER +ARA_TEST_VECTOR_COMMIT +ARA_TEST_FENCE_PC=8000194a +ARA_TEST_REGIONS=1 \
+  +ARA_TEST_R0_BASE=800027c0 +ARA_TEST_R0_WORDS=2892 +ARA_TEST_R0_NAME=ara_test_ordered_segment_signature
 ```
 
-For each NF1 input, use its app/fence/base from the table, one region of 2376 words, and `+V01_R0_NAME=v01_ordered_signature`. For the consecutive-load input, the recorded region arguments are:
+For each NF1 input, use its app/fence/base from the table, one region of 2376 words, and `+ARA_TEST_R0_NAME=ara_test_ordered_signature`. For the consecutive-load input, the recorded region arguments are:
 
 ```text
-+V01_FENCE_PC=8000053a +V01_REGIONS=4
-+V01_R0_BASE=80001380 +V01_R0_WORDS=384 +V01_R0_NAME=index8_pair_observed
-+V01_R1_BASE=80001980 +V01_R1_WORDS=12 +V01_R1_NAME=index8_pair_status
-+V01_R2_BASE=800019c0 +V01_R2_WORDS=396 +V01_R2_NAME=index8_pair_buffers
-+V01_R3_BASE=80002000 +V01_R3_WORDS=64 +V01_R3_NAME=index8_pair_offsets
++ARA_TEST_FENCE_PC=8000053a +ARA_TEST_REGIONS=4
++ARA_TEST_R0_BASE=80001380 +ARA_TEST_R0_WORDS=384 +ARA_TEST_R0_NAME=index8_pair_observed
++ARA_TEST_R1_BASE=80001980 +ARA_TEST_R1_WORDS=12 +ARA_TEST_R1_NAME=index8_pair_status
++ARA_TEST_R2_BASE=800019c0 +ARA_TEST_R2_WORDS=396 +ARA_TEST_R2_NAME=index8_pair_buffers
++ARA_TEST_R3_BASE=80002000 +ARA_TEST_R3_WORDS=64 +ARA_TEST_R3_NAME=index8_pair_offsets
 ```
 
-Each call used a separate output directory and `$LIMIT_TCL` containing `run 20 ms` then `quit`. The same ELF for an app was reused across the three variants.
+Each call used a separate output directory and `$LIMIT_TCL` containing `run 20 ms`, `run 0 ns`, and `quit`. The same ELF for an app was reused across the three variants.
 
 The five model builds use the same flags/definitions with the corresponding `.spike` target. They also use the [section-wildcard linker adaptation](../common/spike_sections.patch) for LLVM suffixed sections. The official target enables vector state in startup. The actual model command form is:
 
@@ -137,14 +137,14 @@ The five model builds use the same flags/definitions with the corresponding `.sp
   "$ARA_ROOT/apps/bin/idx_nf2.spike"
 ```
 
-From the public material directory, check export integrity with `common/review_ara_observer.py --elf <RTL_ELF> --log <run>/v01_observer.log --expect-target 0`. Use target 96 for the S NF2 counterexample; use `--allow-incomplete` without an expected target for the two cutoff controls. Apply the value checker to each exported signature:
+From the public material directory, check export integrity with `common/review_ara_observer.py --elf <RTL_ELF> --log <run>/ara_test_observer.log --expect-target 0`. Use target 96 for the S NF2 counterexample; use `--allow-incomplete` without an expected target for the two cutoff controls. Apply the value checker to each exported signature:
 
 ```bash
-python3 batch5/check_index_signature.py --nf 1 --first 12 --count 1 --vl 2 --signature "$RUN/v01_region_0.hex"
-python3 batch5/check_index_signature.py --nf 1 --first 12 --count 1 --vl 3 --signature "$RUN/v01_region_0.hex"
-python3 batch5/check_index_signature.py --nf 1 --first 14 --count 1 --vl 3 --signature "$RUN/v01_region_0.hex"
-python3 batch5/check_index_signature.py --nf 2 --first 12 --count 1 --vl 3 --signature "$RUN/v01_region_0.hex"
-python3 batch5/check_index_signature.py --pair --regions "$RUN/v01_region_0.hex" "$RUN/v01_region_1.hex" "$RUN/v01_region_2.hex" "$RUN/v01_region_3.hex"
+python3 cases/check_index_signature.py --nf 1 --first 12 --count 1 --vl 2 --signature "$RUN/ara_test_region_0.hex"
+python3 cases/check_index_signature.py --nf 1 --first 12 --count 1 --vl 3 --signature "$RUN/ara_test_region_0.hex"
+python3 cases/check_index_signature.py --nf 1 --first 14 --count 1 --vl 3 --signature "$RUN/ara_test_region_0.hex"
+python3 cases/check_index_signature.py --nf 2 --first 12 --count 1 --vl 3 --signature "$RUN/ara_test_region_0.hex"
+python3 cases/check_index_signature.py --pair --regions "$RUN/ara_test_region_0.hex" "$RUN/ara_test_region_1.hex" "$RUN/ara_test_region_2.hex" "$RUN/ara_test_region_3.hex"
 ```
 
 Select the one command that matches the input. The S NF2 value check must fail with the exact differences above. For Spike, use its `signature.hex`; the consecutive-load check uses `--pair --signature <signature.hex>` to include padding.
@@ -152,20 +152,24 @@ Select the one command that matches the input. The S NF2 value check must fail w
 For DC, set the existing dependency roots as in the [DC instructions](../common/dc/README.md), then use the actual direct entry for O and I:
 
 ```bash
-V01_DC_SOURCE="$ARA_ROOT/hardware/src/lane/lane_sequencer.sv" \
-  V01_DC_OUTPUT="$DC_O" dc_shell -f "$PUBLIC_ROOT/common/dc/check_lane_sequencer.tcl"
-V01_DC_SOURCE="$ARA_I_ROOT/hardware/src/lane/lane_sequencer.sv" \
-  V01_DC_OUTPUT="$DC_I" dc_shell -f "$PUBLIC_ROOT/common/dc/check_lane_sequencer.tcl"
+ARA_TEST_DC_SOURCE="$ARA_ROOT/hardware/src/lane/lane_sequencer.sv" \
+  ARA_TEST_DC_OUTPUT="$DC_O" dc_shell -f "$PUBLIC_ROOT/common/dc/check_lane_sequencer.tcl"
+ARA_TEST_DC_SOURCE="$ARA_I_ROOT/hardware/src/lane/lane_sequencer.sv" \
+  ARA_TEST_DC_OUTPUT="$DC_I" dc_shell -f "$PUBLIC_ROOT/common/dc/check_lane_sequencer.tcl"
 ```
 
 The shared package/dependency root is the original fixed checkout in both calls. Only the selected DUT source changes; `$DC_O` and `$DC_I` are separate absolute output directories. These commands do not describe an S DC run.
 
 ## Input revision and limits
 
-These results use new portable inputs. The draft user-mode `mstatus` write was removed. The consecutive-load input gained its full signature, and the selected final fence follows all result writes. Old downstream ELF results do not apply to these new ELFs. Source and binary hashes in `results.json` record this actual revision.
+These results use new portable inputs. The draft user-mode `mstatus` write was removed. The consecutive-load input gained its full signature, and the selected final fence follows all result writes. Earlier integration ELF results do not apply to these new ELFs. Source and binary hashes in `results.json` record this actual revision.
 
 No NF2 prefix was added or run. The fixed five-input matrix is the scope of this result. It does not cover all index widths, all VL values, masked memory, every segment size, or the complete #468 patch. The retained NF2 original PASS is not replaced by a different failing setup. The checker rejects NF2 VL2 and NF1 VL2-store combinations that these inputs do not support. O/I generic structural checks are accepted; no S DC result is claimed.
 
-## Public source formatting
+## Current inputs and retained history
 
-The public C copies use clang-format 20.1.0 after the recorded runs. The consecutive-load input also removes its stale no-run header, with every byte after that comment unchanged. Their complete canonical C tokens and literal contents match the original compiled sources, after standard line splicing and adjacent-string concatenation. `results.json` separates current public hashes from compiled-run source hashes. The three public C files passed the official clang-format 20.1.0 check. The formatting edit caused no software build or RTL run.
+The current public C, observers, and checkers were used for the new builds and runs. Their exact SHA256 values and all new RTL/model ELF hashes are in results.json. The byte-identical consecutive-load ELF is still rebound and rerun; the other four RTL ELFs changed. The previous public commit retains the original source formatting checks, original compiled-source hashes, old ELFs, and all earlier failures. These old records are not presented as tests of the renamed input.
+
+Combination J adds the segment-decode and local mask fixes to I. It passes the rebuilt `idx64_vl3` and `idx_nf2` ELFs with the same full signatures, final-fence/drain checks, normal completion, and assertion checks. This establishes only those two compositions.
+
+The DC script logic, RTL, packages, and wrapper types are byte-identical to their accepted versions. Only public variable labels changed. The generic lane results above are reused evidence, not new synthesis runs.

@@ -17,23 +17,23 @@
 #endif
 #define STR_I(x) #x
 #define STR(x) STR_I(x)
-#ifndef V01_NFIELDS
-#define V01_NFIELDS 2
+#ifndef ARA_TEST_NFIELDS
+#define ARA_TEST_NFIELDS 2
 #endif
-#if V01_NFIELDS < 2 || V01_NFIELDS > 8
-#error V01_NFIELDS_must_be_2_through_8
+#if ARA_TEST_NFIELDS < 2 || ARA_TEST_NFIELDS > 8
+#error ARA_TEST_NFIELDS_must_be_2_through_8
 #endif
 #define ELEMENTS 64
 #define MEMORY_WORDS 32
 #define CASES 16
-#ifndef V01_FIRST
-#define V01_FIRST 12
+#ifndef ARA_TEST_FIRST
+#define ARA_TEST_FIRST 12
 #endif
-#ifndef V01_COUNT
-#define V01_COUNT 1
+#ifndef ARA_TEST_COUNT
+#define ARA_TEST_COUNT 1
 #endif
 #define HEADER_WORDS 12
-#define CASE_WORDS (52 + V01_NFIELDS * ELEMENTS)
+#define CASE_WORDS (52 + ARA_TEST_NFIELDS * ELEMENTS)
 #define SIGNATURE_WORDS (HEADER_WORDS + CASES * CASE_WORDS)
 #define SIGNATURE_BYTES (SIGNATURE_WORDS * 4)
 
@@ -49,26 +49,26 @@
  * state: 0 not started, 1 started, 2 checked successfully, 3 checked with
  * errors.
  */
-__asm__(".pushsection .data.v01_ordered_segment_signature,\"aw\",@progbits\n"
+__asm__(".pushsection .data.ara_test_ordered_segment_signature,\"aw\",@progbits\n"
         ".balign 64\n"
 #ifdef SPIKE
         ".global begin_signature\nbegin_signature:\n"
 #endif
-        ".global v01_ordered_segment_signature\n.type "
-        "v01_ordered_segment_signature,@object\n"
-        "v01_ordered_segment_signature:\n.zero " STR(
+        ".global ara_test_ordered_segment_signature\n.type "
+        "ara_test_ordered_segment_signature,@object\n"
+        "ara_test_ordered_segment_signature:\n.zero " STR(
             SIGNATURE_BYTES) "\n"
                              ".size "
-                             "v01_ordered_segment_signature,.-v01_ordered_"
+                             "ara_test_ordered_segment_signature,.-ara_test_ordered_"
                              "segment_signature\n"
 #ifdef SPIKE
                              ".global end_signature\nend_signature:\n"
 #endif
                              ".popsection\n");
-extern volatile uint32_t v01_ordered_segment_signature[SIGNATURE_WORDS];
+extern volatile uint32_t ara_test_ordered_segment_signature[SIGNATURE_WORDS];
 
 struct vector_words {
-  uint32_t before, data[V01_NFIELDS * ELEMENTS], after;
+  uint32_t before, data[ARA_TEST_NFIELDS * ELEMENTS], after;
 };
 struct memory_words {
   uint32_t before, data[MEMORY_WORDS], after;
@@ -93,7 +93,7 @@ static struct fixture storage __attribute__((aligned(64)));
 static unsigned checks, failures, completed;
 /* First error is inspectable on both platforms, including when UART is absent.
  */
-volatile uint64_t v01_ordered_segment_first_error[5];
+volatile uint64_t ara_test_ordered_segment_first_error[5];
 struct result {
   uintptr_t returned, vl, vtype, vstart, first, index_max;
 };
@@ -103,13 +103,13 @@ static void check(unsigned id, unsigned field, unsigned i, uint64_t actual,
   ++checks;
   if (actual != expected) {
     if (!failures) {
-      v01_ordered_segment_first_error[0] = id;
-      v01_ordered_segment_first_error[1] = field;
-      v01_ordered_segment_first_error[2] = i;
-      v01_ordered_segment_first_error[3] = actual;
-      v01_ordered_segment_first_error[4] = expected;
+      ara_test_ordered_segment_first_error[0] = id;
+      ara_test_ordered_segment_first_error[1] = field;
+      ara_test_ordered_segment_first_error[2] = i;
+      ara_test_ordered_segment_first_error[3] = actual;
+      ara_test_ordered_segment_first_error[4] = expected;
 #ifndef SPIKE
-      printf("V01_ORDERED_SEG_FIRST_FAIL id=%u field=%u i=%u got=%08x:%08x "
+      printf("ARA_TEST_ORDERED_SEG_FIRST_FAIL id=%u field=%u i=%u got=%08x:%08x "
              "want=%08x:%08x\n",
              id, field, i, (unsigned)(actual >> 32), (unsigned)actual,
              (unsigned)(expected >> 32), (unsigned)expected);
@@ -190,7 +190,7 @@ static uint8_t index_byte(unsigned id, unsigned is_store, unsigned eew,
           M) ", tu, mu\n"                                                      \
              "vle" STR(W) ".v v4, (%[index])\n"                                \
                           "vsetvli t0, zero, e32, m1, tu, mu\n" FIELD_LIST(    \
-                              V01_NFIELDS,                                     \
+                              ARA_TEST_NFIELDS,                                     \
                               LOAD_FIELD) "vlm.v v0, (%[mask])\n"              \
                                           "vsetvli %[returned], %[avl], e32, " \
                                           "m1, tu, mu\n" INSN                  \
@@ -200,7 +200,7 @@ static uint8_t index_byte(unsigned id, unsigned is_store, unsigned eew,
                                           "vmv.x.s %[first], v8\n"             \
                                           "vsetvli t0, zero, e32, m1, tu, "    \
                                           "mu\n" FIELD_LIST(                   \
-                                              V01_NFIELDS,                     \
+                                              ARA_TEST_NFIELDS,                     \
                                               STORE_FIELD) "fence rw, rw\n"    \
       : [returned] "=&r"(r.returned), [vl] "=&r"(r.vl), [vt] "=&r"(r.vtype),   \
         [vs] "=&r"(r.vstart), [first] "=&r"(r.first),                          \
@@ -213,20 +213,20 @@ static uint8_t index_byte(unsigned id, unsigned is_store, unsigned eew,
 #define WIDTH_CASES(BASE, W, M)                                                \
   case BASE:                                                                   \
     EXEC(W, M,                                                                 \
-         "vloxseg" STR(V01_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4");     \
+         "vloxseg" STR(ARA_TEST_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4");     \
     break;                                                                     \
   case BASE + 1:                                                               \
     EXEC(W, M,                                                                 \
-         "vloxseg" STR(V01_NFIELDS) "ei" STR(                                  \
+         "vloxseg" STR(ARA_TEST_NFIELDS) "ei" STR(                                  \
              W) ".v v8, (%[memory]), v4, v0.t");                               \
     break;                                                                     \
   case BASE + 2:                                                               \
     EXEC(W, M,                                                                 \
-         "vsoxseg" STR(V01_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4");     \
+         "vsoxseg" STR(ARA_TEST_NFIELDS) "ei" STR(W) ".v v8, (%[memory]), v4");     \
     break;                                                                     \
   case BASE + 3:                                                               \
     EXEC(W, M,                                                                 \
-         "vsoxseg" STR(V01_NFIELDS) "ei" STR(                                  \
+         "vsoxseg" STR(ARA_TEST_NFIELDS) "ei" STR(                                  \
              W) ".v v8, (%[memory]), v4, v0.t");                               \
     break
 
@@ -241,8 +241,8 @@ static struct result execute(unsigned id, volatile struct fixture *p) {
   return r;
 }
 static void put64(unsigned position, uint64_t value) {
-  v01_ordered_segment_signature[position] = (uint32_t)value;
-  v01_ordered_segment_signature[position + 1] = (uint32_t)(value >> 32);
+  ara_test_ordered_segment_signature[position] = (uint32_t)value;
+  ara_test_ordered_segment_signature[position + 1] = (uint32_t)(value >> 32);
 }
 static void run(unsigned id) {
   const unsigned eew = 8U << (id / 4);
@@ -251,12 +251,12 @@ static void run(unsigned id) {
   const unsigned base = HEADER_WORDS + id * CASE_WORDS;
   const unsigned previous = failures;
   volatile struct fixture *p = (&storage);
-  v01_ordered_segment_signature[base] = id;
-  v01_ordered_segment_signature[base + 1] = is_store;
-  v01_ordered_segment_signature[base + 2] = eew;
-  v01_ordered_segment_signature[base + 3] = masked;
-  v01_ordered_segment_signature[base + 4] = 1;
-  for (unsigned f = 0; f < V01_NFIELDS; ++f)
+  ara_test_ordered_segment_signature[base] = id;
+  ara_test_ordered_segment_signature[base + 1] = is_store;
+  ara_test_ordered_segment_signature[base + 2] = eew;
+  ara_test_ordered_segment_signature[base + 3] = masked;
+  ara_test_ordered_segment_signature[base + 4] = 1;
+  for (unsigned f = 0; f < ARA_TEST_NFIELDS; ++f)
     for (unsigned i = 0; i < ELEMENTS; ++i) {
       p->old.data[f * ELEMENTS + i] = old_value(id, f, i);
       p->out.data[f * ELEMENTS + i] = UINT32_C(0xcccccccc);
@@ -284,7 +284,7 @@ static void run(unsigned id) {
   check(id, 2, 0, r.vtype, 16); /* SEW32/m1, tu/mu, vill=0. */
   check(id, 3, 0, r.vstart, 0);
   check(id, 4, 0, r.index_max, ELEMENTS);
-  for (unsigned f = 0; f < V01_NFIELDS; ++f)
+  for (unsigned f = 0; f < ARA_TEST_NFIELDS; ++f)
     for (unsigned i = 0; i < ELEMENTS; ++i) {
       const unsigned active = i < 3 && (!masked || (i & 1));
       const unsigned element = f * ELEMENTS + i;
@@ -295,14 +295,14 @@ static void run(unsigned id) {
       check(id, 8, element, p->old.data[element], old_value(id, f, i));
       if (element == 0)
         check(id, 9, 0, (uint32_t)r.first, wanted);
-      v01_ordered_segment_signature[base + 16 + element] = p->out.data[element];
+      ara_test_ordered_segment_signature[base + 16 + element] = p->out.data[element];
     }
   for (unsigned i = 0; i < MEMORY_WORDS; ++i) {
-    const uint32_t wanted = is_store && i >= 2 && i < 2 + V01_NFIELDS
+    const uint32_t wanted = is_store && i >= 2 && i < 2 + ARA_TEST_NFIELDS
                                 ? old_value(id, i - 2, masked ? 1 : 2)
                                 : memory_value(id, i);
     check(id, 7, i, p->memory.data[i], wanted);
-    v01_ordered_segment_signature[base + 16 + V01_NFIELDS * ELEMENTS + i] =
+    ara_test_ordered_segment_signature[base + 16 + ARA_TEST_NFIELDS * ELEMENTS + i] =
         p->memory.data[i];
   }
   check(id, 10, 0, p->old.before, guard(id, 0, 0));
@@ -323,15 +323,15 @@ static void run(unsigned id) {
   put64(base + 7, r.vl);
   put64(base + 9, r.vtype);
   put64(base + 11, r.vstart);
-  v01_ordered_segment_signature[base + 13] = failures - previous;
-  v01_ordered_segment_signature[base + 14] = (uint32_t)r.index_max;
-  v01_ordered_segment_signature[base + 15] = masked ? 1 : 3;
-  const unsigned guards = base + 16 + V01_NFIELDS * ELEMENTS + MEMORY_WORDS;
-  v01_ordered_segment_signature[guards] = p->memory.before;
-  v01_ordered_segment_signature[guards + 1] = p->memory.after;
-  v01_ordered_segment_signature[guards + 2] = p->out.before;
-  v01_ordered_segment_signature[guards + 3] = p->out.after;
-  v01_ordered_segment_signature[base + 4] = failures == previous ? 2 : 3;
+  ara_test_ordered_segment_signature[base + 13] = failures - previous;
+  ara_test_ordered_segment_signature[base + 14] = (uint32_t)r.index_max;
+  ara_test_ordered_segment_signature[base + 15] = masked ? 1 : 3;
+  const unsigned guards = base + 16 + ARA_TEST_NFIELDS * ELEMENTS + MEMORY_WORDS;
+  ara_test_ordered_segment_signature[guards] = p->memory.before;
+  ara_test_ordered_segment_signature[guards + 1] = p->memory.after;
+  ara_test_ordered_segment_signature[guards + 2] = p->out.before;
+  ara_test_ordered_segment_signature[guards + 3] = p->out.after;
+  ara_test_ordered_segment_signature[base + 4] = failures == previous ? 2 : 3;
   ++completed;
 }
 
@@ -340,29 +340,29 @@ int main(void) {
   __asm__ volatile("csrw vstart, zero" ::: "memory");
   __asm__ volatile("csrr %0, vlenb" : "=r"(vlenb));
   for (unsigned i = 0; i < SIGNATURE_WORDS; ++i)
-    v01_ordered_segment_signature[i] = 0;
-  v01_ordered_segment_signature[0] = UINT32_C(0x56314f53);
-  v01_ordered_segment_signature[1] = 1;
-  v01_ordered_segment_signature[2] = CASES;
-  v01_ordered_segment_signature[3] = V01_NFIELDS;
-  v01_ordered_segment_signature[4] = 32;
-  v01_ordered_segment_signature[5] = 3;
-  v01_ordered_segment_signature[6] = (uint32_t)vlenb;
-  v01_ordered_segment_signature[10] = CASE_WORDS;
-  v01_ordered_segment_signature[11] = SIGNATURE_WORDS;
+    ara_test_ordered_segment_signature[i] = 0;
+  ara_test_ordered_segment_signature[0] = UINT32_C(0x56314f53);
+  ara_test_ordered_segment_signature[1] = 1;
+  ara_test_ordered_segment_signature[2] = CASES;
+  ara_test_ordered_segment_signature[3] = ARA_TEST_NFIELDS;
+  ara_test_ordered_segment_signature[4] = 32;
+  ara_test_ordered_segment_signature[5] = 3;
+  ara_test_ordered_segment_signature[6] = (uint32_t)vlenb;
+  ara_test_ordered_segment_signature[10] = CASE_WORDS;
+  ara_test_ordered_segment_signature[11] = SIGNATURE_WORDS;
   check(CASES, 18, 0, vlenb, 256);
   check(CASES, 19, 0, ((uintptr_t)&storage % 64) == 0, 1);
   if (!failures)
-    for (unsigned id = V01_FIRST; id < V01_FIRST + V01_COUNT; ++id)
+    for (unsigned id = ARA_TEST_FIRST; id < ARA_TEST_FIRST + ARA_TEST_COUNT; ++id)
       run(id);
-  check(CASES, 20, 0, completed, V01_COUNT);
-  v01_ordered_segment_signature[7] = checks;
-  v01_ordered_segment_signature[8] = failures;
-  v01_ordered_segment_signature[9] = completed;
+  check(CASES, 20, 0, completed, ARA_TEST_COUNT);
+  ara_test_ordered_segment_signature[7] = checks;
+  ara_test_ordered_segment_signature[8] = failures;
+  ara_test_ordered_segment_signature[9] = completed;
   __asm__ volatile("fence rw, rw" : : : "memory");
 #ifndef SPIKE
-  printf("V01_ORDERED_SEG_DONE nf=%u cases=%u checks=%u errors=%u\n",
-         V01_NFIELDS, completed, checks, failures);
+  printf("ARA_TEST_ORDERED_SEG_DONE nf=%u cases=%u checks=%u errors=%u\n",
+         ARA_TEST_NFIELDS, completed, checks, failures);
 #endif
   return failures ? 96 : 0;
 }
