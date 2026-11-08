@@ -17,7 +17,7 @@ and the rounding increment. Every case checks all 64 outputs, both sources,
 guards, VL/VSTART, and VCSR. No masks or nonzero active VSTART are tested.
 
 The same ELF runs on both versions, SHA256
-`35550773e189639d23fee5789ce21a5f01465fd36b451c527ad11841a432d610`. Both finish normally. Main reports
+`e73377c18e240f9b0e40cf834d5658f7eb9ec58246ccdb2d810239ed554576a2`. Both finish normally. Main reports
 64 cases, 14080 checks, 1152 errors, and tohost=1.
 The candidate reports the same counts with zero errors and tohost=0.
 
@@ -36,18 +36,19 @@ Ara checkout:
 
 ```sh
 LLVM_ROOT=/path/to/llvm-20.1.0
-make -C apps config=2_lanes LLVM_INSTALL_DIR="$LLVM_ROOT" \
+make -C apps config=2_lanes LLVM_INSTALL_DIR="$LLVM_ROOT" RISCV_STRIP=true \
   LLVM_FLAGS="--target=riscv64-unknown-elf --sysroot=$LLVM_ROOT/riscv64-unknown-elf -isystem $LLVM_ROOT/riscv64-unknown-elf/include -march=rv64gcv_zfh_zvfh -mabi=lp64d -mno-relax -fuse-ld=lld --rtlib=compiler-rt -L$LLVM_ROOT/riscv64-unknown-elf/lib" \
   LLVM_V_FLAGS="-fno-vectorize -fno-slp-vectorize -mno-implicit-float" \
   bin/vaadd_boundary
 ```
 
-Freeze that ELF and use it on both RTL versions. Generate a distinct VCS
-build directory for each checkout:
+Freeze that ELF and use it on both RTL versions. The new SoC comparisons
+reuse the frozen original/candidate executables. The following commands build
+the same source versions in separate directories for reproduction:
 
 ```sh
 ARA_ROOT=$PWD
-BUILD_DIR="$PWD/build-ext-hazards"
+BUILD_DIR="$PWD/build-vaadd-boundary"
 SPIKE_ROOT=/path/to/spike
 mkdir "$BUILD_DIR"
 bender --local --git-submodules false script vcs \
@@ -64,8 +65,8 @@ vcs -full64 -sverilog -timescale=1ns/1ps -assert svaext -top ara_tb \
   -CFLAGS "-I$SPIKE_ROOT/include" -o simv
 mkdir -p run/work
 cd run/work
-printf 'run 20ms\nquit\n' > control.tcl
-timeout 600 "$BUILD_DIR/simv" -ucli -i control.tcl \
+printf 'run 20 ms\nrun 0 ns\nquit\n' > control.tcl
+timeout 600 "$BUILD_DIR/simv" -no_save -ucli -do control.tcl \
   +PRELOAD=/absolute/path/to/frozen/vaadd_boundary.elf > run.log 2>&1
 ```
 
@@ -75,24 +76,46 @@ does not establish success. Each parallel run needs its own parent and
 working directory because `ara_tb` also creates `../gold_results.txt`.
 
 
-For the combinational test, use a separate build directory for each RTL
-version. Generate and execute the same source-analysis command above.
-Use one frozen copy of the unit inputs for both versions:
+For the combinational test, compile the real ALU and its packages directly.
+Use a separate empty build directory for each RTL version. ARA_ROOT selects
+that version; INPUT_ROOT selects one frozen public input copy for both builds.
+These are the source arguments used for the recorded unit calls:
 
 ```sh
 INPUT_ROOT=/path/to/frozen/apps/vaadd_boundary
-vlogan -full64 -sverilog -timescale=1ns/1ps "$INPUT_ROOT/tb_vaadd_alu.sv"
-vcs -full64 -sverilog -timescale=1ns/1ps -top tb_v01_vaadd_alu -o alu_simv
+vcs -full64 -sverilog -timescale=1ns/1ps +define+NR_LANES=2+VLEN=2048 \
+  +incdir+"$ARA_ROOT/hardware/deps/axi/include" \
+  +incdir+"$ARA_ROOT/hardware/deps/common_cells/include" \
+  +incdir+"$ARA_ROOT/hardware/include" \
+  "$ARA_ROOT/hardware/deps/common_cells/src/cf_math_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/axi/src/axi_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/fpnew/src/fpnew_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/cva6/core/include/config_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/cva6/core/include/cv64a6_imafdcv_sv39_config_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/cva6/core/include/build_config_pkg.sv" \
+  "$ARA_ROOT/hardware/deps/cva6/core/include/riscv_pkg.sv" \
+  "$ARA_ROOT/hardware/include/rvv_pkg.sv" \
+  "$ARA_ROOT/hardware/include/ara_pkg.sv" \
+  "$ARA_ROOT/hardware/src/lane/simd_alu.sv" \
+  "$INPUT_ROOT/tb_vaadd_alu.sv" -top tb_ara_test_vaadd_alu -o alu_simv
 python3 "$INPUT_ROOT/verify_vectors.py"
-timeout 60 ./alu_simv +V01_VAADD_VECTORS="$INPUT_ROOT/vectors.txt" > unit.log 2>&1
-timeout 60 ./alu_simv +V01_VAADD_VECTORS="$INPUT_ROOT/vectors.txt" \
-  +V01_WRONG_GOLD > wrong_gold.log 2>&1
+printf 'run 1000 ns\nrun 0 ns\nquit\n' > control.tcl
+timeout 60 ./alu_simv -no_save -ucli -do control.tcl \
+  +ARA_TEST_VAADD_VECTORS="$INPUT_ROOT/vectors.txt" > unit.log 2>&1
+timeout 60 ./alu_simv -no_save -ucli -do control.tcl \
+  +ARA_TEST_VAADD_VECTORS="$INPUT_ROOT/vectors.txt" \
+  +ARA_TEST_WRONG_GOLD > wrong_gold.log 2>&1
 ```
 
 Require exactly `cases=256 checks=513 errors=0 wrong_gold=0` on the
 candidate. Main must report 160 errors. The candidate wrong-gold run must
 report exactly one error and the expected failure marker. The TB has an
 explicit 1 us HDL deadline. All accepted runs end at 256 ns.
+
+The production RTL is unchanged by the public-name update. The test inputs
+were rebuilt and the original/candidate comparisons above were rerun.
+The following regression, lint, and DC results reuse their unchanged inputs
+from the earlier accepted runs.
 
 The candidate passes unmodified official vadd, vaadd, and vaaddu tests.
 Effective `+lint=all` reports the same 427 normalized diagnostics before/after.

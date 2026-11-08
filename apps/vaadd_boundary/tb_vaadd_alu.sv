@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-// V01 local reproducer. Compile with the frozen real ara_pkg, rvv_pkg and
+// Ara local reproducer. Compile with the frozen real ara_pkg, rvv_pkg and
 // either baseline or candidate simd_alu; do not compile two simd_alu modules.
-module tb_v01_vaadd_alu;
+module tb_ara_test_vaadd_alu;
   timeunit 1ns;
   timeprecision 1ps;
 
@@ -38,8 +38,8 @@ module tb_v01_vaadd_alu;
     elen_t expected;
 
     path = "vectors.txt";
-    if ($value$plusargs("V01_VAADD_VECTORS=%s", path)) begin end
-    wrong_gold = $test$plusargs("V01_WRONG_GOLD");
+    if ($value$plusargs("ARA_TEST_VAADD_VECTORS=%s", path)) begin end
+    wrong_gold = $test$plusargs("ARA_TEST_WRONG_GOLD");
     cases = 0;
     checks = 0;
     errors = 0;
@@ -55,11 +55,11 @@ module tb_v01_vaadd_alu;
     vew = EW8;
     vxrm = '0;
     if ($bits(elen_t) != 64 || $bits(vxsat_t) != 8)
-      $fatal(1, "V01_VAADD_ALU_INPUT_ERROR unexpected real package widths");
+      $fatal(1, "ARA_TEST_VAADD_ALU_INPUT_ERROR unexpected real package widths");
     fd = $fopen(path, "r");
     if (fd == 0)
-      $fatal(1, "V01_VAADD_ALU_INPUT_ERROR cannot open %s", path);
-    $display("V01_VAADD_ALU_START expected_cases=%0d wrong_gold=%0d vectors=%s",
+      $fatal(1, "ARA_TEST_VAADD_ALU_INPUT_ERROR cannot open %s", path);
+    $display("ARA_TEST_VAADD_ALU_START expected_cases=%0d wrong_gold=%0d vectors=%s",
              ExpectedCases, wrong_gold, path);
 
     // Each line: signed(1=VAADD), SEW, vxrm, A64, B64, expected64.
@@ -71,7 +71,7 @@ module tb_v01_vaadd_alu;
       if (parsed != 6 || op_selector != 1 ||
           !(sew inside {8, 16, 32, 64}) || rounding_mode < 0 || rounding_mode > 3 ||
           $isunknown({operand_a, operand_b, expected}))
-        $fatal(1, "V01_VAADD_ALU_INPUT_ERROR malformed line=%0d parsed=%0d",
+        $fatal(1, "ARA_TEST_VAADD_ALU_INPUT_ERROR malformed line=%0d parsed=%0d",
                line_number, parsed);
       op = VAADD;
       case (sew)
@@ -89,7 +89,7 @@ module tb_v01_vaadd_alu;
       if (result !== expected) begin
         errors++;
         if (errors <= MaxErrorLines)
-          $display("V01_VAADD_ALU_ERROR case=%0d signed=%0d sew=%0d vxrm=%0d A=%016h B=%016h result=%016h expected=%016h",
+          $display("ARA_TEST_VAADD_ALU_ERROR case=%0d signed=%0d sew=%0d vxrm=%0d A=%016h B=%016h result=%016h expected=%016h",
                    cases, op_selector, sew, rounding_mode, operand_a, operand_b,
                    result, expected);
       end
@@ -97,7 +97,7 @@ module tb_v01_vaadd_alu;
       if (vxsat !== 8'h00) begin
         errors++;
         if (errors <= MaxErrorLines)
-          $display("V01_VAADD_ALU_ERROR case=%0d vxsat=%02h expected=00", cases, vxsat);
+          $display("ARA_TEST_VAADD_ALU_ERROR case=%0d vxsat=%02h expected=00", cases, vxsat);
       end
     end
     $fclose(fd);
@@ -106,11 +106,11 @@ module tb_v01_vaadd_alu;
     if (cases != ExpectedCases) begin
       errors++;
       if (errors <= MaxErrorLines)
-        $display("V01_VAADD_ALU_ERROR cases=%0d expected_cases=%0d", cases, ExpectedCases);
+        $display("ARA_TEST_VAADD_ALU_ERROR cases=%0d expected_cases=%0d", cases, ExpectedCases);
     end
-    $display("V01_VAADD_ALU_DONE cases=%0d checks=%0d errors=%0d wrong_gold=%0d",
+    $display("ARA_TEST_VAADD_ALU_DONE cases=%0d checks=%0d errors=%0d wrong_gold=%0d",
              cases, checks, errors, wrong_gold);
-    if (errors != 0) $fatal(1, "V01_VAADD_ALU_FAIL");
+    if (errors != 0) $fatal(1, "ARA_TEST_VAADD_ALU_FAIL");
     $finish;
   end
 endmodule
